@@ -8,6 +8,7 @@ Install Packages:
 Install TypeScript Definitions:
 > tsd install
 
+## Running Site
 Run:
 > node bin/www
 
