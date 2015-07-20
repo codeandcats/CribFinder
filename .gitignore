@@ -25,3 +25,14 @@ build/Release
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
+
+# Generated css, js and map
+*.js
+*.css
+*.map
+!public/libs/**/*.js
+!public/libs/**/*.css
+!public/libs/**/*.map
+
+# Typings (these are pulled down by tsd)
+typings/
