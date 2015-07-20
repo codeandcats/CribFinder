@@ -1,0 +1,54 @@
+{
+  "version": "v4",
+  "repo": "borisyankov/DefinitelyTyped",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts",
+  "installed": {
+    "node/node.d.ts": {
+      "commit": "a9c59f8166b4d7f1e8c4309a506987c2e6d78b5e"
+    },
+    "mime/mime.d.ts": {
+      "commit": "a9c59f8166b4d7f1e8c4309a506987c2e6d78b5e"
+    },
+    "serve-static/serve-static.d.ts": {
+      "commit": "a9c59f8166b4d7f1e8c4309a506987c2e6d78b5e"
+    },
+    "express/express.d.ts": {
+      "commit": "a9c59f8166b4d7f1e8c4309a506987c2e6d78b5e"
+    },
+    "mongodb/mongodb.d.ts": {
+      "commit": "b0e50691d881db03370d24f681d724c500ec31d9"
+    },
+    "connect-flash/connect-flash.d.ts": {
+      "commit": "69303fd9e52d8e0e97a92d096966aea5fb7630c5"
+    },
+    "passport/passport.d.ts": {
+      "commit": "69303fd9e52d8e0e97a92d096966aea5fb7630c5"
+    },
+    "express-session/express-session.d.ts": {
+      "commit": "69303fd9e52d8e0e97a92d096966aea5fb7630c5"
+    },
+    "cheerio/cheerio.d.ts": {
+      "commit": "c0fdc8f774149840e99e45656be3013143f31309"
+    },
+    "request/request.d.ts": {
+      "commit": "c0fdc8f774149840e99e45656be3013143f31309"
+    },
+    "form-data/form-data.d.ts": {
+      "commit": "c0fdc8f774149840e99e45656be3013143f31309"
+    },
+    "bcrypt/bcrypt.d.ts": {
+      "commit": "8c9ede30fca2a095018e70940806cc9c8aa122f6"
+    },
+    "es6-promise/es6-promise.d.ts": {
+      "commit": "8c9ede30fca2a095018e70940806cc9c8aa122f6"
+    },
+    "node-uuid/node-uuid.d.ts": {
+      "commit": "159b808f9b035ca971d19d93ac675030e87048d8"
+    },
+    "passport-local/passport-local.d.ts": {
+      "commit": "159b808f9b035ca971d19d93ac675030e87048d8"
+    }
+  }
+}
