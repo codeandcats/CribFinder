@@ -4,6 +4,7 @@
 	"editor.insertSpaces": false,
 	"files.exclude": {
 		"**/*.js": { "when": "$(basename).ts" },
+		"**/*.map": { },
 		"**/*.css": { "when": "$(basename).less" }
 	}
 }
