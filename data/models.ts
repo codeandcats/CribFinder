@@ -65,6 +65,7 @@ export interface IProperty extends IPropertySearchResult, IModel {
 	hasPool: boolean;
 	hasGym: boolean;
 	hasLaundry: boolean;
+	isFurnished: boolean;
 
 	distanceToTram: number;
 	distanceToTrain: number;
@@ -100,4 +101,38 @@ export interface IUser extends IModel {
 		email: string,
 		name: string
 	}
+}
+
+export interface IRentalSearch extends IModel {
+	location: string;
+	propertyTypes: PropertyType[];
+	
+	minRent: number;
+	maxRent: number;
+	
+	minBeds: number;
+	maxBeds: number;
+	
+	minBathrooms: number;
+	maxBathrooms: number;
+	
+	minParks: number;
+	maxParks: number;
+	
+	hasDishwasher: boolean;
+	hasAirCon: boolean;
+	hasBalcony: boolean;
+	hasPool: boolean;
+	hasGym: boolean;
+	hasLaundry: boolean;
+	isFurnished: boolean;
+	
+	minDistanceToTram: number;
+	maxDistanceToTram: number;
+	
+	minDistanceToTrain: number;
+	maxDistanceToTrain: number;
+	
+	minStarRating: number;
+	maxStarRating: number;
 }
