@@ -5,7 +5,7 @@ export function map(app: express.Express) {
 	
 	var router = express.Router();
 	
-	router.get('/', function(req, res, next) {
+	router.get('/', authRequired, function(req, res, next) {
 		res.render('index', { title: 'The Jungle' });
 	});
 	
@@ -13,11 +13,11 @@ export function map(app: express.Express) {
 		res.render('login', { message: req.flash('loginMessage') });
 	});
 	
-	// process the login form
+	// Process the login form
 	app.post('/login', passport.authenticate('local-login', {
-		successRedirect : '/profile', // redirect to the secure profile section
-		failureRedirect : '/login', // redirect back to the signup page if there is an error
-		failureFlash : true // allow flash messages
+		successRedirect : '/', // Redirect to the secure profile section
+		failureRedirect : '/login', // Redirect back to the signup page if there is an error
+		failureFlash : true // Allow flash messages
 	}));
 	
 	router.get('/signup', function(req, res, next) {
@@ -26,7 +26,7 @@ export function map(app: express.Express) {
 	
 	// Process the signup form
 	app.post('/signup', passport.authenticate('local-signup', {
-		successRedirect : '/profile', // Redirect to the secure profile section
+		successRedirect : '/', // Redirect to the secure profile section
 		failureRedirect : '/signup', // Redirect back to the signup page if there is an error
 		failureFlash : true // Allow flash messages
 	}));
@@ -53,6 +53,6 @@ export function map(app: express.Express) {
 		}
 		
 		// If they aren't redirect them to the home page
-		res.redirect('/');
+		res.redirect('/login');
 	}
 }
