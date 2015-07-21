@@ -4,6 +4,7 @@ import printer = require('./utils/printer');
 import promise = require('es6-promise');
 var Promise = promise.Promise;
 var faker = require('faker');
+import scraper = require('./utils/realEstateScraper');
 
 //printer.configure({ maxDepth: 5 });
 
@@ -78,6 +79,41 @@ switch (process.argv[2] || '') {
 			});
 		}
 		break;
+		
+	case 'scrape':
+		let url = process.argv[3] || ''; 
+		if (url.indexOf('realestate.com.au') > -1) {
+			if (url.indexOf('/rent/') > -1) {
+				scraper.scrapeSearchResults({ url: url }, (err, results) => {
+					printer.logValue('Listing', results);
+				});
+			}
+			else {
+				scraper.scrapePropertyPage(url, (err, property) => {
+					printer.logValue('Property', property);
+					
+					if (process.argv[4] == 'save') {
+						database.properties.findOne({ vendor: property.vendor, vendorId: property.vendorId }, (err, existing) => {
+							console.log();
+							if (!existing) {
+								database.properties.insert(property, (err, result) => {
+									if (err) {
+										console.error("Property failed to save: ", err);
+									}
+									else if (result.n > 0) {
+										console.log("Property saved");
+									}
+									else {
+										console.log("Property failed to save");
+									}
+								});
+							}
+						});
+					}
+				});
+			}
+		}
+		break;
 
 	default:
 		console.log('Unknown args: ' + process.argv.splice(0, 2).join(' '));
@@ -123,6 +159,7 @@ function getNewProperty(): models.IProperty {
 		hasGym: faker.random.boolean(),
 		hasLaundry: faker.random.boolean(),
 		hasPool: faker.random.boolean(),
+		isFurnished: faker.random.boolean(),
 		parkCount: faker.random.number(2),
 		images: [],
 		isArchived: false,
