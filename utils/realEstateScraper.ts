@@ -118,7 +118,7 @@ function parseMoney(money: string, defaultValue?: number): number {
 	return result;
 }
 
-export function scrapePropertyPage(url: string, callback: (err: Error, property: models.IPropertyAddress) => any) {
+export function scrapePropertyPage(url: string, callback: (err: Error, property: models.IProperty) => any) {
 	
 	request(url, (err, res, html) =>
 	{
@@ -183,7 +183,7 @@ export function scrapePropertyPage(url: string, callback: (err: Error, property:
 		moreInfoElement.text(moreInfoElement.attr('data-description'));
 		
 		descriptionElement.find('br').each((i, br) => {
-			(<Cheerio><any>br).replaceWith($('<span>&lt;br&gt;</span>'));
+			$(br).replaceWith($('<span>&lt;br&gt;</span>'));
 		});
 		
 		descriptionElement.find('br').replaceWith($('<span>!!!!!!</span>'));
@@ -224,6 +224,8 @@ export function scrapePropertyPage(url: string, callback: (err: Error, property:
 			(features.find('li:contains("Laundry")').length > 0) ||
 			(description.search(/laundry/gi) > -1);
 		
+		var isFurnished = (description.search(/([^n]|^)furnished/gi) > -1);
+		
 		var result: models.IProperty = {
 			
 			isArchived: false,
@@ -251,6 +253,7 @@ export function scrapePropertyPage(url: string, callback: (err: Error, property:
 			hasPool: hasPool,
 			hasGym: hasGym,
 			hasLaundry: hasLaundry,
+			isFurnished: isFurnished,
 			
 			distanceToTrain: null,
 			distanceToTram: null,
