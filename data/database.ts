@@ -29,11 +29,11 @@ export function genId() {
 	return uuid.v1();
 }
 
-export class Crud<T> {
+export class Crud<T extends models.IModel> {
 	
 	protected collectionName: string;
 	
-	public findOne(query: Object, callback: (err: Error, user: T) => any): void {
+	public findOne(query: Object, callback: (err: Error, result: T) => any): void {
 		connect((err, db) => {
 			if (err) {
 				callback(err, null);
@@ -69,6 +69,8 @@ export class Crud<T> {
 				}
 			}
 			else {
+				document._id = document._id || genId();
+				
 				db.collection(this.collectionName).insert(document, (err, result) => {
 					db.close();
 					if (callback) {
@@ -142,3 +144,14 @@ class PropertyCrud extends Crud<models.IProperty> {
 }
 
 export var properties = new PropertyCrud();
+
+class RentalSearchCrud extends Crud<models.IRentalSearch> {
+	
+	protected collectionName = 'rentalSearches';
+	
+}
+
+export var rentalSearches = new RentalSearchCrud();
+
+
+
