@@ -37,6 +37,9 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 import routes = require('./routes');
 routes.map(app);
 
+import api = require('./api');
+api.map(app);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
 	var err = <any>new Error('Not Found');
