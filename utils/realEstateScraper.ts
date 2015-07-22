@@ -19,7 +19,7 @@ interface ISearchResultsScrapeOptions {
 	url: string;
 }
 
-export function scrapeSearchResults(
+export function scrapeRentalSearchResults(
 	options: ISearchResultsScrapeOptions, 
 	callback: (err: Error, results: models.IPropertySearchResult[]) => any) {
 		
@@ -118,7 +118,7 @@ function parseMoney(money: string, defaultValue?: number): number {
 	return result;
 }
 
-export function scrapePropertyPage(url: string, callback: (err: Error, property: models.IProperty) => any) {
+export function scrapeRentalPropertyPage(url: string, callback: (err: Error, property: models.IProperty) => any) {
 	
 	request(url, (err, res, html) =>
 	{
@@ -229,6 +229,8 @@ export function scrapePropertyPage(url: string, callback: (err: Error, property:
 		var result: models.IProperty = {
 			
 			isArchived: false,
+			
+			listingType: models.ListingType.Rental,
 			propertyType: propertyType,
 			
 			address: address,
