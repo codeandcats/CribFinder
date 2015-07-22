@@ -1,7 +1,12 @@
 'use strict';
 
 export interface IModel {
-	_id: string;
+	_id?: string;
+}
+
+export enum ListingType {
+	Rental,
+	ForSale
 }
 
 export enum PropertyType {
@@ -45,6 +50,8 @@ export interface IPropertySearchResult {
 
 export interface IProperty extends IPropertySearchResult, IModel {
 	isArchived: boolean;
+
+	listingType: ListingType;
 
 	propertyType: PropertyType;
 
@@ -103,36 +110,44 @@ export interface IUser extends IModel {
 	}
 }
 
-export interface IRentalSearch extends IModel {
+export interface ISearch extends IModel {
+	title: string;
+	
 	location: string;
-	propertyTypes: PropertyType[];
 	
-	minRent: number;
-	maxRent: number;
+	listingType: ListingType;
+	propertyTypes?: PropertyType[];
 	
-	minBeds: number;
-	maxBeds: number;
+	minRent?: number;
+	maxRent?: number;
 	
-	minBathrooms: number;
-	maxBathrooms: number;
+	minBeds?: number;
+	maxBeds?: number;
 	
-	minParks: number;
-	maxParks: number;
+	minBathrooms?: number;
+	maxBathrooms?: number;
 	
-	hasDishwasher: boolean;
-	hasAirCon: boolean;
-	hasBalcony: boolean;
-	hasPool: boolean;
-	hasGym: boolean;
-	hasLaundry: boolean;
-	isFurnished: boolean;
+	minParks?: number;
+	maxParks?: number;
 	
-	minDistanceToTram: number;
-	maxDistanceToTram: number;
+	hasDishwasher?: boolean;
+	hasAirCon?: boolean;
+	hasBalcony?: boolean;
+	hasPool?: boolean;
+	hasGym?: boolean;
+	hasLaundry?: boolean;
+	isFurnished?: boolean;
 	
-	minDistanceToTrain: number;
-	maxDistanceToTrain: number;
+	minDistanceToTram?: number;
+	maxDistanceToTram?: number;
 	
-	minStarRating: number;
-	maxStarRating: number;
+	minDistanceToTrain?: number;
+	maxDistanceToTrain?: number;
+	
+	minStarRating?: number;
+	maxStarRating?: number;
+	
+	ownerId: string;
+	sharedWithIds: string[];
 }
+

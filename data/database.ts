@@ -145,13 +145,13 @@ class PropertyCrud extends Crud<models.IProperty> {
 
 export var properties = new PropertyCrud();
 
-class RentalSearchCrud extends Crud<models.IRentalSearch> {
+class SearchCrud extends Crud<models.ISearch> {
 	
-	protected collectionName = 'rentalSearches';
+	protected collectionName = 'searches';
 	
 }
 
-export var rentalSearches = new RentalSearchCrud();
+export var searches = new SearchCrud();
 
 
 
