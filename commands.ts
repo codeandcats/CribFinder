@@ -18,6 +18,10 @@ function getTable(tableName: string): database.Crud<any> {
 		case 'properties':
 			return database.properties;
 			
+		case 'search':
+		case 'searches':
+			return database.searches;
+		
 		default:
 			return null;
 	}
@@ -59,12 +63,29 @@ switch (process.argv[2] || '') {
 		var tableName = process.argv[3] || '';
 		var table = getTable(tableName);
 		if (table == database.users) {
-			table.insert(getNewUser(), (err, result) => {
+			let email = process.argv[4];
+			let password = process.argv[5];
+			let passwordHash = database.users.generateHash(password);
+			
+			var newUser: models.IUser = {
+				local: {
+					email: email,
+					passwordHash: passwordHash
+				},
+				facebook: null,
+				google: null,
+				twitter: null
+			};
+			
+			table.insert(newUser, (err, result) => {
 				if (err) {
-					console.log('Error: ', err);
+					console.error('Error: ', err);
+				}
+				else if (result.ok) {
+					console.log('Created user: ' + email);
 				}
 				else {
-					console.log('Created ' + result.n + ' users');
+					console.error('Failed to create user for reasons');
 				}
 			});
 		}
@@ -78,37 +99,93 @@ switch (process.argv[2] || '') {
 				}
 			});
 		}
+		else if (table == database.searches) {
+			let location = process.argv[4];
+			let ownerEmail = process.argv[5];
+			let sharedWithEmail = process.argv[6];
+			
+			let search = getNewSearch(location);
+			
+			database.users.findOne({ 'local.email': ownerEmail }, (err, owner) => {
+				
+				if (err) {
+					console.error('Error finding owner: ', err);
+				}
+				else if (!owner) {
+					console.error('Could not find owner: ' + ownerEmail);
+				}
+				else {
+					search.ownerId = owner._id;
+					
+					function addSearch() {
+						table.insert(search, (err, result) => {
+							if (err) {
+								console.log('Error: ', err);
+							}
+							else {
+								console.log('Created ' + result.n + ' searches');
+							}
+						});
+					}
+					
+					if (!sharedWithEmail) {
+						addSearch();
+					}
+					else {
+						database.users.findOne({ 'local.email': sharedWithEmail }, (err, sharedWith) => {
+							if (err) {
+								console.error('Error finding shared with user: ', err);
+							}
+							else if (!sharedWith) {
+								console.error('Could not find shared with user: ' + sharedWithEmail);
+							}
+							else {
+								search.sharedWithIds.push(sharedWith._id);
+							}
+							
+							addSearch();
+						});
+					}
+				}
+				
+			});
+		}
 		break;
 		
 	case 'scrape':
 		let url = process.argv[3] || ''; 
 		if (url.indexOf('realestate.com.au') > -1) {
 			if (url.indexOf('/rent/') > -1) {
-				scraper.scrapeSearchResults({ url: url }, (err, results) => {
+				scraper.scrapeRentalSearchResults({ url: url }, (err, results) => {
 					printer.logValue('Listing', results);
 				});
 			}
 			else {
-				scraper.scrapePropertyPage(url, (err, property) => {
-					printer.logValue('Property', property);
-					
-					if (process.argv[4] == 'save') {
-						database.properties.findOne({ vendor: property.vendor, vendorId: property.vendorId }, (err, existing) => {
-							console.log();
-							if (!existing) {
-								database.properties.insert(property, (err, result) => {
-									if (err) {
-										console.error("Property failed to save: ", err);
-									}
-									else if (result.n > 0) {
-										console.log("Property saved");
-									}
-									else {
-										console.log("Property failed to save");
-									}
-								});
-							}
-						});
+				scraper.scrapeRentalPropertyPage(url, (err, property) => {
+					if (err) {
+						console.error("Error scraping property: ", err);
+					}
+					else {
+						printer.logValue('Property', property);
+						
+						if (process.argv[4] == 'save') {
+							database.properties.findOne({ vendor: property.vendor, vendorId: property.vendorId }, (err, existing) => {
+								console.log();
+								if (!existing) {
+									database.properties.insert(property, (err, result) => {
+										if (err) {
+											console.error("Property failed to save: ", err);
+										}
+										else if (result.n > 0) {
+											console.log("Property saved");
+										}
+										else {
+											console.log("Property failed to save");
+										}
+									});
+								}
+							});
+						}
 					}
 				});
 			}
@@ -168,8 +245,38 @@ function getNewProperty(): models.IProperty {
 		url: faker.internet.url(),
 		vendor: models.Vendor.RealEstate,
 		vendorId: faker.random.number(1000000),
-		propertyType: models.PropertyType.Apartment
+		propertyType: models.PropertyType.Apartment,
+		listingType: models.ListingType.Rental
 	};
+}
+
+function getNewSearch(location: string): models.ISearch {
+	
+	var search: models.ISearch = {
+		_id: null,
+		title: location,
+		location: location,
+		listingType: models.ListingType.Rental,
+		
+		hasAirCon: faker.random.boolean() ? undefined : faker.random.boolean(),
+		hasBalcony: faker.random.boolean() ? undefined : faker.random.boolean(),
+		hasDishwasher: faker.random.boolean() ? undefined : faker.random.boolean(),
+		hasGym: faker.random.boolean() ? undefined : faker.random.boolean(),
+		hasLaundry: faker.random.boolean() ? undefined : faker.random.boolean(),
+		hasPool: faker.random.boolean() ? undefined : faker.random.boolean(),
+		isFurnished: faker.random.boolean() ? undefined : faker.random.boolean(),
+		
+		ownerId: null,
+		sharedWithIds: [],
+		
+		minBathrooms: faker.random.boolean() ? undefined : faker.random.number(1) + 1,
+		minBedrooms: faker.random.boolean() ? undefined : faker.random.number(1) + 2,
+		minParks: faker.random.boolean() ? undefined : faker.random.number(1) + 1,
+		
+		maxRent: faker.random.boolean() ? undefined : (faker.random.number(3 * 50) + 500)
+	};
+	
+	return search;
 }
 
 /*
