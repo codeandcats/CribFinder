@@ -150,4 +150,3 @@ export interface ISearch extends IModel {
 	ownerId: string;
 	sharedWithIds: string[];
 }
-
