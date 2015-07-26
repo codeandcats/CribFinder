@@ -54,5 +54,16 @@ export function map(app: express.Express) {
 		res.redirect('/');
 	});
 	
+	
+	// Partial Views
+	router.get('/partials/home', function(req, res) {
+		res.render('partials/home');
+	});
+	
+	router.get('/partials/search/results', function(req, res) {
+		res.render('partials/search/results');
+	});
+	
+	
 	app.use('/', router);
 }

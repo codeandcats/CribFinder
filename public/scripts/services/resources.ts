@@ -10,7 +10,7 @@ export interface ISearchResource extends angular.resource.IResourceClass<ISearch
 	update(ISearch) : ISearchResource;
 }
 
-export function SearchResource($resource: ng.resource.IResourceService): ISearchResource {
+export function SearchResource($resource: angular.resource.IResourceService): ISearchResource {
 	// Return the resource, include your custom actions
 	return <ISearchResource>$resource('/api/searches/:id', { id: '@id' }, {
 		get: {
@@ -34,9 +34,9 @@ export interface IUserResource extends angular.resource.IResourceClass<IUser> {
 	active(): IUser;
 }
 
-export function UserResource($resource: ng.resource.IResourceService): IUserResource {
+export function UserResource($resource: angular.resource.IResourceService): IUserResource {
 	return <IUserResource>$resource('/api/users/', {}, {
-		active: <ng.resource.IActionDescriptor>{
+		active: <angular.resource.IActionDescriptor>{
 			method: 'GET',
 			url: '/api/users/active',
 			isArray: false
