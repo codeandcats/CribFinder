@@ -27,5 +27,16 @@ export function map(app: express.Express) {
 		});
 	});
 	
+	router.get('/users/active', authRequired, function(req, res, next) {
+		
+		var userId = req.user._id;
+		
+		database.users.findOne({ _id: userId }, (err, result) => {
+			delete result.local.passwordHash;
+			res.json(result).end();
+		});
+		
+	});
+	
 	app.use('/api', router);
 }

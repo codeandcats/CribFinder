@@ -28,7 +28,9 @@
     "angular": "^1.4.3",
     "gulp-browserify": "^0.5.1",
     "bootstrap": "^3.3.5",
-    "jquery": "^2.1.4"
+    "jquery": "^2.1.4",
+    "angular-resource": "^1.4.3",
+    "angular-ui-router": "^0.2.15"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
