@@ -5,9 +5,6 @@
   "path": "typings",
   "bundle": "typings/tsd.d.ts",
   "installed": {
-    "node/node.d.ts": {
-      "commit": "a9c59f8166b4d7f1e8c4309a506987c2e6d78b5e"
-    },
     "mime/mime.d.ts": {
       "commit": "a9c59f8166b4d7f1e8c4309a506987c2e6d78b5e"
     },
@@ -55,6 +52,9 @@
     },
     "jquery/jquery.d.ts": {
       "commit": "6baa15a0d760170b4aeefab68d581a1ea4034aa6"
+    },
+    "node/node.d.ts": {
+      "commit": "f6c8ca47193fb67947944a3170912672ac3e908e"
     }
   }
 }

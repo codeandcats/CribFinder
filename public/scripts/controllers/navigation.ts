@@ -9,7 +9,7 @@ export class NavigationController {
 	public static $inject = ['$scope'];
 	
 	constructor(public scope: INavigationScope) {
-		this.scope.productName = 'Crib Finder';
+		this.scope.productName = 'Crib Finder 2k';
 		this.scope.searches = [];
 	}
 }
