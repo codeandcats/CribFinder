@@ -1,3 +1,5 @@
+/// <reference path="models.ts" />
+
 'use strict';
 
 import mongodb = require('mongodb');

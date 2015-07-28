@@ -1,4 +1,6 @@
 /// <reference path="typings/tsd.d.ts" />
+/// <reference path="api.ts" />
+/// <reference path="routes.ts" />
 
 import express = require('express');
 import path = require('path');

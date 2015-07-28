@@ -1,3 +1,5 @@
+/// <reference path="data/database.ts" />
+
 import express = require('express');
 import passport = require('passport');
 import database = require('./data/database');
