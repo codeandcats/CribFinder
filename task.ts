@@ -1,6 +1,6 @@
 /// <reference path="typings/tsd.d.ts" />
-/// <reference path="utils/printer.ts" />
-/// <reference path="utils/realEstateScraper.ts" />
+/// <reference path="./utils/printer.ts" />
+/// <reference path="./utils/realEstateScraper.ts" />
 
 import database = require('./data/database');
 import models = require('./data/models');
@@ -151,67 +151,84 @@ function addSearch(defaults: { location: string; ownerEmail: string; sharedWithE
 	});
 }
 
-function scrape(options: { url: string, saveToDatabase: boolean }) {
-	if (options.url.indexOf('realestate.com.au') > -1) {
-		if (options.url.indexOf('/rent/') > -1) {
-			scraper.scrapeRentalSearchResults({ url: options.url }, (err, results) => {
-				if (err) {
-					printer.logValue('Error', err);
-				}
-				else {
-					printer.logValue('Listing', results);
-				}
-			});
+function insertProperty(property: models.IProperty): void {
+	database.properties.insert(property, (err, result) => {
+		if (err) {
+			console.error("Property failed to save: ", err);
+		}
+		else if (result.n > 0) {
+			console.log("Property saved");
 		}
 		else {
-			scraper.scrapeRentalPropertyPage(options.url, (err, property) => {
-				if (err) {
-					console.error("Error scraping property: ", err);
-				}
-				else {
-					printer.logValue('Property', property);
-					
-					if (options.saveToDatabase) {
-						database.properties.findOne({ vendor: property.vendor, vendorId: property.vendorId }, (err, existing) => {
-							console.log();
-							if (!existing) {
-								database.properties.insert(property, (err, result) => {
-									if (err) {
-										console.error("Property failed to save: ", err);
-									}
-									else if (result.n > 0) {
-										console.log("Property saved");
-									}
-									else {
-										console.log("Property failed to save");
-									}
-								});
-							}
-							else {
-								property._id = existing._id;								
-								
-								database.properties.update({
-										vendor: property.vendor,
-										vendorId: property.vendorId
-									},
-									property,
-									(err, result) => {
-										if (err) {
-											console.log('Failed to update property: ', err);
-										}
-										else if (result.nModified > 0) {
-											console.log('Property updated');
-										}
-										else {
-											console.log('Property failed to update');
-										}
-									});
-							}
-						});
-					}
-				}
-			});
+			console.log("Property failed to save");
 		}
+	});
+}
+
+function updateProperty(existing, update: models.IProperty): void {
+	// Retain some fields from the existing property 
+	update._id = existing._id;
+	update.comments = existing.comments;
+	
+	// Copy over overriden fields
+	for (var fieldName of existing.overriddenFields) {
+		update[fieldName] = existing[fieldName];
+	}
+	
+	database.properties.update({
+			vendor: update.vendor,
+			vendorId: update.vendorId
+		},
+		update,
+		(err, result) => {
+			if (err) {
+				console.log('Failed to update property: ', err);
+			}
+			else if (result.nModified > 0) {
+				console.log('Property updated');
+			}
+			else {
+				console.log('Property failed to update');
+			}
+		});
+}
+
+function scrape(options: { url: string, saveToDatabase: boolean }) {
+	if (options.url.indexOf('realestate.com.au') == -1) {
+		console.error('Scrape failed, incompatible url: ', options.url);
+	}
+	
+	if (options.url.indexOf('/rent/') > -1) {
+		scraper.scrapeRentalSearchResults({ url: options.url }, (err, results) => {
+			if (err) {
+				printer.logValue('Error', err);
+			}
+			else {
+				printer.logValue('Listing', results);
+			}
+		});
+	}
+	else {
+		scraper.scrapeRentalPropertyPage(options.url, (err, property) => {
+			if (err) {
+				console.error("Error scraping property: ", err);
+			}
+			else {
+				printer.logValue('Property', property);
+				
+				if (options.saveToDatabase) {
+					database.properties.findOne({ vendor: property.vendor, vendorId: property.vendorId }, (err, existing) => {
+						console.log();
+						if (!existing) {
+							insertProperty(property);
+						}
+						else {
+							updateProperty(existing, property);
+						}
+					});
+				}
+			}
+		});
 	}
 }
 
@@ -294,6 +311,7 @@ function getNewProperty(): models.IProperty {
 		bond: faker.random.number({ min: 400, max: 700 }) * 4,
 		pricePerWeek: faker.random.number({ min: 400, max: 700 }),
 		description: faker.lorem.paragraph(),
+		inspectionTimes: [],
 		distanceToTrain: null,
 		distanceToTram: null,
 		hasAirCon: faker.random.boolean(),
@@ -312,7 +330,8 @@ function getNewProperty(): models.IProperty {
 		vendor: models.Vendor.RealEstate,
 		vendorId: faker.random.number(1000000),
 		propertyType: models.PropertyType.Apartment,
-		listingType: models.ListingType.Rental
+		listingType: models.ListingType.Rental,
+		comments: []
 	};
 }
 
@@ -344,81 +363,3 @@ function getNewSearch(location: string): models.ISearch {
 	
 	return search;
 }
-
-/*
-var userToAdd: models.IUser = {
-	_id: database.genId(),
-	local: {
-		email: 'bendaniel@gmail.com',
-		passwordHash: database.users.generateHash('KittyCatz')
-	},
-	facebook: null,
-	twitter: null,
-	google: null
-}; 
-
-function addUser(): Promise<any> {
-	return new Promise(resolve => {
-		console.log('');
-		console.log('insert user:');
-
-		database.users.insert(userToAdd, (err, result) => {
-			printer.logValue('User.insert Error', err);
-			printer.logValue('User.insert Result', result);
-			resolve();
-		});
-	});
-}
-
-function updateUser(): Promise<any> {
-	return new Promise(resolve => {
-		console.log('');
-		console.log('updating user:');
-
-		database.users.update(
-			{
-				'local.email': 'bendaniel@gmail.com'
-			},
-			{
-				$set: {
-					local: { email: 'codeandcats@gmail.com' }
-				} 
-			},
-			(err, result) => {
-				printer.logValue('err', err);
-				printer.logValue('result', result);
-				resolve();
-			});
-	});
-}
-
-function listUsers(): Promise<any> {
-	return new Promise(resolve => {
-		console.log('');
-		console.log('listing users:');
-		database.users.find(null, (err, users) => {
-			printer.logValue('err', err);
-			printer.logValue('users', users);
-			resolve();
-		});
-	});
-}
-
-function removeUsers(): Promise<any> {
-	return new Promise(resolve => {
-		console.log('');
-		console.log('removing users:');
-		database.users.remove({}, (err, result) => {
-			printer.logValue('err', err);
-			printer.logValue('result', result);
-			resolve();
-		});
-	});
-}
-
-removeUsers().then(() => {
-	//addUser().then(() => {
-	//	updateUser().then(listUsers);
-	//});
-});
-*/
