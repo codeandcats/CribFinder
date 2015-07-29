@@ -55,6 +55,11 @@ export interface IComment extends IModel {
 	seenByIds: string[];
 }
 
+export interface IInspectionTime {
+	startTime: Date;
+	endTime: Date;
+}
+
 export interface IProperty extends IPropertySearchResult, IModel {
 	isArchived: boolean;
 
@@ -86,6 +91,8 @@ export interface IProperty extends IPropertySearchResult, IModel {
 
 	title: string;
 	description: string;
+	
+	inspectionTimes: IInspectionTime[];
 
 	starRating: number;
 	

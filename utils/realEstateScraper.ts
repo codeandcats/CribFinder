@@ -1,7 +1,8 @@
 /// <reference path="../typings/tsd.d.ts" />
 /// <reference path="../data/models.ts" />
 /// <reference path="./property.ts" />
-/// <reference path="strings.ts" />
+/// <reference path="./strings.ts" />
+/// <reference path="./printer.ts" />
 
 import request = require('request');
 import cheerio = require('cheerio');
@@ -179,6 +180,7 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 		
 		// Title & Description
 		var descriptionElement = $('#description');
+		var inspectionTimesContainer = descriptionElement.find('.inspectionTimes');
 		var title = descriptionElement.find('p.title').text();
 		descriptionElement = descriptionElement.find('p.body');
 		
@@ -198,6 +200,18 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 		var description = description.replace(/<br>/, '\r\n');
 		
 		description = description.replace(/<br>/gi, '\r\n');
+		
+		// Inspection Times
+		var inspectionTimes: models.IInspectionTime[] = [];
+		var inspectionTimeElements = inspectionTimesContainer.find('a.calendar-item');
+		for (let index = 0; index < inspectionTimeElements.length; index++) {
+			let element = inspectionTimeElements[index];
+			inspectionTimes.push({
+				startTime: new Date(Date.parse($(element).find('meta[itemprop="startDate"]').attr('content'))),
+				endTime: new Date(Date.parse($(element).find('meta[itemprop="endDate"]').attr('content'))),
+			}); 
+		}
+		
 		
 		var hasAirCon = 
 			(features.find('li:contains("Air Conditioning")').length > 0) ||
@@ -253,6 +267,7 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 			bond: bond,
 			title: title, 
 			description: description,
+			inspectionTimes: inspectionTimes,
 			
 			hasAirCon: hasAirCon,
 			hasBalcony: hasBalcony,
@@ -266,7 +281,9 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 			distanceToTram: null,
 			images: [],
 			overriddenFields: [],
-			starRating: null
+			starRating: null,
+			
+			comments: []
 		};
 		
 		result.starRating = propertyUtils.calculateStarRating(result);
