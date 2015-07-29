@@ -1,7 +1,11 @@
+/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../data/models.ts" />
+/// <reference path="strings.ts" />
+
 import request = require('request');
 import cheerio = require('cheerio');
 import models = require('../data/models'); 
-import stringUtils = require('../utils/strings');
+import stringUtils = require('./strings');
 
 export function getIdFromUrl(url: string): string {
 	var result = '';
@@ -55,8 +59,7 @@ export function scrapeRentalSearchResults(
 	});
 };
 
-export function getStreetInfo(street: string): models.IStreetInfo 
-{
+export function getStreetInfo(street: string): models.IStreetInfo {
 	var parts = street.split(/\s+/);
 	
 	var numbers: string[] = [];
