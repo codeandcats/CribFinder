@@ -1,3 +1,7 @@
+/// <reference path="typings/tsd.d.ts" />
+/// <reference path="utils/printer.ts" />
+/// <reference path="utils/realEstateScraper.ts" />
+
 import database = require('./data/database');
 import models = require('./data/models');
 import printer = require('./utils/printer');
@@ -27,169 +31,227 @@ function getTable(tableName: string): database.Crud<any> {
 	}
 }
 
-switch (process.argv[2] || '') {
-	case 'clear':
-		var tableName = process.argv[3] || '';
-		var table = getTable(tableName);
+function clearTable(tableName: string) {
+	var table = getTable(tableName || '');
+	if (table) {
+		table.remove({}, (err, result) => {
+			if (err) {
+				console.log('Error: ', err);
+			}
+			else {
+				console.log('Removed ' + result.n + ' ' + tableName);
+			}
+		});
+	}
+}
 
-		if (table) {
-			table.remove({}, (err, result) => {
+function listTable(tableName: string) {
+	var table = getTable(tableName || '');
+	if (table) {
+		table.find({}, (err, results) => {
+			if (err) {
+				console.log('Error: ', err);
+			}
+			else {
+				printer.logValue(tableName, results);
+			}
+		});
+	}
+}
+
+function addUser(credentials: { email: string, password: string }) {
+	let passwordHash = database.users.generateHash(credentials.password);
+	
+	var newUser: models.IUser = {
+		local: {
+			email: credentials.email,
+			passwordHash: passwordHash
+		},
+		facebook: null,
+		google: null,
+		twitter: null
+	};
+	
+	var table = getTable('users');
+	
+	table.insert(newUser, (err, result) => {
+		if (err) {
+			console.error('Error: ', err);
+		}
+		else if (result.ok) {
+			console.log('Created user: ' + credentials.email);
+		}
+		else {
+			console.error('Failed to create user for reasons');
+		}
+	});
+}
+
+
+function addProperty(): void {
+	var table = getTable('properties');
+	
+	table.insert(getNewProperty(), (err, result) => {
+		if (err) {
+			console.log('Error: ', err);
+		}
+		else {
+			console.log('Created ' + result.n + ' properties');
+		}
+	});
+}
+
+function addSearch(defaults: { location: string; ownerEmail: string; sharedWithEmail?: string }): void {
+	database.users.findOne({ 'local.email': defaults.ownerEmail }, (err, owner) => {
+		
+		if (err) {
+			console.error('Error finding owner: ', err);
+		}
+		else if (!owner) {
+			console.error('Could not find owner: ' + defaults.ownerEmail);
+		}
+		else {
+			let search = getNewSearch(defaults.location);
+			
+			search.ownerId = owner._id;
+			
+			var table = getTable('searches');
+			
+			function addSearch() {
+				table.insert(search, (err, result) => {
+					if (err) {
+						console.log('Error: ', err);
+					}
+					else {
+						console.log('Created ' + result.n + ' searches');
+					}
+				});
+			}
+			
+			if (!defaults.sharedWithEmail) {
+				addSearch();
+			}
+			else {
+				database.users.findOne({ 'local.email': defaults.sharedWithEmail }, (err, sharedWith) => {
+					if (err) {
+						console.error('Error finding shared with user: ', err);
+					}
+					else if (!sharedWith) {
+						console.error('Could not find shared with user: ' + defaults.sharedWithEmail);
+					}
+					else {
+						search.sharedWithIds.push(sharedWith._id);
+					}
+					
+					addSearch();
+				});
+			}
+		}
+		
+	});
+}
+
+function scrape(options: { url: string, saveToDatabase: boolean }) {
+	if (options.url.indexOf('realestate.com.au') > -1) {
+		if (options.url.indexOf('/rent/') > -1) {
+			scraper.scrapeRentalSearchResults({ url: options.url }, (err, results) => {
 				if (err) {
-					console.log('Error: ', err);
+					printer.logValue('Error', err);
 				}
 				else {
-					console.log('Removed ' + result.n + ' ' + tableName);
+					printer.logValue('Listing', results);
 				}
 			});
 		}
+		else {
+			scraper.scrapeRentalPropertyPage(options.url, (err, property) => {
+				if (err) {
+					console.error("Error scraping property: ", err);
+				}
+				else {
+					printer.logValue('Property', property);
+					
+					if (options.saveToDatabase) {
+						database.properties.findOne({ vendor: property.vendor, vendorId: property.vendorId }, (err, existing) => {
+							console.log();
+							if (!existing) {
+								database.properties.insert(property, (err, result) => {
+									if (err) {
+										console.error("Property failed to save: ", err);
+									}
+									else if (result.n > 0) {
+										console.log("Property saved");
+									}
+									else {
+										console.log("Property failed to save");
+									}
+								});
+							}
+							else {
+								database.properties.update({
+									vendor: property.vendor,
+									vendorId: property.vendorId },
+									property, (err, result) => {
+										if (err) {
+											console.log('Failed to update property: ', err);
+										}
+										else if (result.nModified > 0) {
+											console.log('Property updated');
+										}
+										else {
+											console.log('Property failed to update');
+										}
+									});
+							}
+						});
+					}
+				}
+			});
+		}
+	}
+}
+
+switch (process.argv[2] || '') {
+	case 'clear':
+		clearTable(process.argv[3]);
 		break;
 
 	case 'list':
-		var tableName = process.argv[3] || '';
-		var table = getTable(tableName);
-		if (table) {
-			table.find({}, (err, results) => {
-				if (err) {
-					console.log('Error: ', err);
-				}
-				else {
-					printer.logValue(tableName, results);
-				}
-			});
-		}
+		listTable(process.argv[3]);
 		break;
 
 	case 'add':
-		var tableName = process.argv[3] || '';
-		var table = getTable(tableName);
-		if (table == database.users) {
-			let email = process.argv[4];
-			let password = process.argv[5];
-			let passwordHash = database.users.generateHash(password);
-			
-			var newUser: models.IUser = {
-				local: {
-					email: email,
-					passwordHash: passwordHash
-				},
-				facebook: null,
-				google: null,
-				twitter: null
-			};
-			
-			table.insert(newUser, (err, result) => {
-				if (err) {
-					console.error('Error: ', err);
-				}
-				else if (result.ok) {
-					console.log('Created user: ' + email);
-				}
-				else {
-					console.error('Failed to create user for reasons');
-				}
-			});
-		}
-		else if (table == database.properties) {
-			table.insert(getNewProperty(), (err, result) => {
-				if (err) {
-					console.log('Error: ', err);
-				}
-				else {
-					console.log('Created ' + result.n + ' properties');
-				}
-			});
-		}
-		else if (table == database.searches) {
-			let location = process.argv[4];
-			let ownerEmail = process.argv[5];
-			let sharedWithEmail = process.argv[6];
-			
-			let search = getNewSearch(location);
-			
-			database.users.findOne({ 'local.email': ownerEmail }, (err, owner) => {
+		var tableName = String(process.argv[3] || '').toLowerCase();
+		
+		switch (tableName) {
+			case 'user':
+			case 'users':
+				addUser({
+					email: process.argv[4],
+					password: process.argv[5]
+				});
+				break;
 				
-				if (err) {
-					console.error('Error finding owner: ', err);
-				}
-				else if (!owner) {
-					console.error('Could not find owner: ' + ownerEmail);
-				}
-				else {
-					search.ownerId = owner._id;
-					
-					function addSearch() {
-						table.insert(search, (err, result) => {
-							if (err) {
-								console.log('Error: ', err);
-							}
-							else {
-								console.log('Created ' + result.n + ' searches');
-							}
-						});
-					}
-					
-					if (!sharedWithEmail) {
-						addSearch();
-					}
-					else {
-						database.users.findOne({ 'local.email': sharedWithEmail }, (err, sharedWith) => {
-							if (err) {
-								console.error('Error finding shared with user: ', err);
-							}
-							else if (!sharedWith) {
-								console.error('Could not find shared with user: ' + sharedWithEmail);
-							}
-							else {
-								search.sharedWithIds.push(sharedWith._id);
-							}
-							
-							addSearch();
-						});
-					}
-				}
-				
-			});
+			case 'property':
+			case 'properties':
+				addProperty();
+				break;
+			
+			case 'search':
+			case 'searches':
+				addSearch({
+					location: process.argv[4],
+					ownerEmail: process.argv[5],
+					sharedWithEmail: process.argv[6]
+				});
+				break;
 		}
-		break;
 		
 	case 'scrape':
-		let url = process.argv[3] || ''; 
-		if (url.indexOf('realestate.com.au') > -1) {
-			if (url.indexOf('/rent/') > -1) {
-				scraper.scrapeRentalSearchResults({ url: url }, (err, results) => {
-					printer.logValue('Listing', results);
-				});
-			}
-			else {
-				scraper.scrapeRentalPropertyPage(url, (err, property) => {
-					if (err) {
-						console.error("Error scraping property: ", err);
-					}
-					else {
-						printer.logValue('Property', property);
-						
-						if (process.argv[4] == 'save') {
-							database.properties.findOne({ vendor: property.vendor, vendorId: property.vendorId }, (err, existing) => {
-								console.log();
-								if (!existing) {
-									database.properties.insert(property, (err, result) => {
-										if (err) {
-											console.error("Property failed to save: ", err);
-										}
-										else if (result.n > 0) {
-											console.log("Property saved");
-										}
-										else {
-											console.log("Property failed to save");
-										}
-									});
-								}
-							});
-						}
-					}
-				});
-			}
-		}
+		scrape({
+			url: process.argv[3] || '',
+			saveToDatabase: process.argv[4] == 'save'
+		});
 		break;
 
 	default:
