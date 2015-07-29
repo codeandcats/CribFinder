@@ -188,10 +188,14 @@ function scrape(options: { url: string, saveToDatabase: boolean }) {
 								});
 							}
 							else {
+								property._id = existing._id;								
+								
 								database.properties.update({
-									vendor: property.vendor,
-									vendorId: property.vendorId },
-									property, (err, result) => {
+										vendor: property.vendor,
+										vendorId: property.vendorId
+									},
+									property,
+									(err, result) => {
 										if (err) {
 											console.log('Failed to update property: ', err);
 										}

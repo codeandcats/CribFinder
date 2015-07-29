@@ -1,11 +1,13 @@
 /// <reference path="../typings/tsd.d.ts" />
 /// <reference path="../data/models.ts" />
+/// <reference path="./property.ts" />
 /// <reference path="strings.ts" />
 
 import request = require('request');
 import cheerio = require('cheerio');
-import models = require('../data/models'); 
+import models = require('../data/models');
 import stringUtils = require('./strings');
+import propertyUtils = require('./property');
 
 export function getIdFromUrl(url: string): string {
 	var result = '';
@@ -266,6 +268,8 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 			overriddenFields: [],
 			starRating: null
 		};
+		
+		result.starRating = propertyUtils.calculateStarRating(result);
 		
 		callback(null, <any>result);
 	});

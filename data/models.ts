@@ -48,6 +48,13 @@ export interface IPropertySearchResult {
 	url: string;
 }
 
+export interface IComment extends IModel {
+	authorId: string;
+	creationTime: Date;
+	message: string;
+	seenByIds: string[];
+}
+
 export interface IProperty extends IPropertySearchResult, IModel {
 	isArchived: boolean;
 
@@ -81,6 +88,8 @@ export interface IProperty extends IPropertySearchResult, IModel {
 	description: string;
 
 	starRating: number;
+	
+	comments: IComment[];
 
 	overriddenFields?: string[];
 }
