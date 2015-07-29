@@ -32,7 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 import passport = require('passport');
 import flash = require('connect-flash');
 import expressSession = require('express-session');
-app.use(expressSession({ secret: 'ilovescotchscotchyscotchscotch' })); // session secret
+app.use(expressSession({ secret: 'stinkywizzleteats' })); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
