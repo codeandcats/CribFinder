@@ -151,7 +151,7 @@ function addSearch(defaults: { location: string; ownerEmail: string; sharedWithE
 	});
 }
 
-function insertProperty(property: models.IProperty): void {
+function insertProperty(property: models.IProperty, done?: () => any): void {
 	database.properties.insert(property, (err, result) => {
 		if (err) {
 			console.error("Property failed to save: ", err);
@@ -165,7 +165,7 @@ function insertProperty(property: models.IProperty): void {
 	});
 }
 
-function updateProperty(existing, update: models.IProperty): void {
+function updateProperty(existing, update: models.IProperty, done?: () => any): void {
 	// Retain some fields from the existing property 
 	update._id = existing._id;
 	update.comments = existing.comments;
@@ -193,9 +193,36 @@ function updateProperty(existing, update: models.IProperty): void {
 		});
 }
 
+function saveProperty(property: models.IProperty, done?: () => any) {
+	database.properties.findOne({ vendor: property.vendor, vendorId: property.vendorId }, (err, existing) => {
+		console.log();
+		if (!existing) {
+			insertProperty(property, done);
+		}
+		else {
+			updateProperty(existing, property, done);
+		}
+	});
+}
+
 function scrape(options: { url: string, saveToDatabase: boolean }) {
 	if (options.url.indexOf('realestate.com.au') == -1) {
 		console.error('Scrape failed, incompatible url: ', options.url);
+	}
+	
+	function scrapeProperty(url: string, saveToDatabase: boolean, done?: () => any) {
+		scraper.scrapeRentalPropertyPage(url, (err, property) => {
+			if (err) {
+				console.error("Error scraping property: ", err);
+			}
+			else {
+				printer.logValue('Property', property);
+				
+				if (saveToDatabase) {
+					saveProperty(property);
+				}
+			}
+		});
 	}
 	
 	if (options.url.indexOf('/rent/') > -1) {
@@ -205,30 +232,25 @@ function scrape(options: { url: string, saveToDatabase: boolean }) {
 			}
 			else {
 				printer.logValue('Listing', results);
+				
+				var scrapeCount = 0;
+				
+				for (var result of results) {
+					scrapeProperty(result.url, options.saveToDatabase, () =>
+						{
+							console.log('');
+							
+							scrapeCount++;
+							if (scrapeCount == results.length) {
+								console.log(`Finished scraping all ${scrapeCount} properties`);
+							}
+						});
+				}
 			}
 		});
 	}
 	else {
-		scraper.scrapeRentalPropertyPage(options.url, (err, property) => {
-			if (err) {
-				console.error("Error scraping property: ", err);
-			}
-			else {
-				printer.logValue('Property', property);
-				
-				if (options.saveToDatabase) {
-					database.properties.findOne({ vendor: property.vendor, vendorId: property.vendorId }, (err, existing) => {
-						console.log();
-						if (!existing) {
-							insertProperty(property);
-						}
-						else {
-							updateProperty(existing, property);
-						}
-					});
-				}
-			}
-		});
+		scrapeProperty(options.url, options.saveToDatabase);
 	}
 }
 
