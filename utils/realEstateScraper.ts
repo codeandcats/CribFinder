@@ -10,6 +10,32 @@ import models = require('../data/models');
 import stringUtils = require('./strings');
 import propertyUtils = require('./property');
 
+export interface ILocationSuggestion {
+	name: string;
+	score: number;
+}
+
+export function getLocationSuggestions(prefix: string, done: (err: Error, results: ILocationSuggestion[]) => any) {
+	if (!prefix) {
+		done(null, []);
+		return;
+	}
+	
+	var url = 'http://www.realestate.com.au/suggestwhere.ds?query=' + 
+		encodeURIComponent(prefix);
+		
+	request(url, (err, res, json) => {
+		if (err) {
+			done(err, null);
+		}
+		else {
+			var suggestions = JSON.parse(json);
+			var results = suggestions.map(suggestion => { return { name: suggestion.key, score: suggestion.value } });
+			done(null, results);
+		}
+	});
+}
+
 export function getIdFromUrl(url: string): string {
 	var result = '';
 	
@@ -20,6 +46,95 @@ export function getIdFromUrl(url: string): string {
 	result = match[1];
 	
 	return result;
+}
+
+export function getSearchUrl(search: models.ISearch, options?: { page?: number }): string {
+	options = options || {};
+	options.page = options.page || 0;
+	
+	// http://www.realestate.com.au/rent/property-unit+apartment-with-2-bedrooms-between-0-600-in-melbourne+city+-+greater+region%2c+vic/list-1?numParkingSpaces=2&maxBeds=any&source=location-search
+	var url = 'http://www.realestate.com.au/rent/';
+	
+	var hasAddedToUrl = false;
+	var hasAddedQueryParam = false;
+	
+	function addToUrl(criteria: string) {
+		if (!criteria) {
+			return;
+		}
+		if (hasAddedToUrl) {
+			url += '-';
+		}
+		else {
+			hasAddedToUrl = true;
+		}
+		url += criteria.toLowerCase();
+	}
+	
+	function addQueryParam(param: string) {
+		if (!param) {
+			return;
+		}
+		if (!hasAddedQueryParam) {
+			url += '?';
+			hasAddedQueryParam = true;
+		}
+		else {
+			url += '&';
+		}
+		url += param.toLowerCase();
+	}
+	
+	function encode(value: string) {
+		// Replace spaces with '+'
+		return encodeURIComponent(value).replace(/%20/gi, '+');
+	}
+	
+	if (search.propertyTypes && search.propertyTypes.length) {
+		let criteria = 'property-';
+		for (var propertyType of search.propertyTypes) {
+			if (propertyType != models.PropertyType.Other) {
+				criteria += propertyType.toString().toLowerCase();
+			}
+		}
+		
+		if (search.propertyTypes.indexOf(models.PropertyType.Unit) > -1 && 
+			search.propertyTypes.indexOf(models.PropertyType.Apartment) > -1) {
+			criteria += 'unit+apartment';
+		}
+		
+		addToUrl(criteria);
+	}
+	
+	if (search.minBedrooms) {
+		addToUrl('with-' + search.minBedrooms + '-bedroom' + (search.minBedrooms > 1 ? 's': ''));
+	}
+	
+	if (search.minRent || search.maxRent) {
+		addToUrl('between-' + (search.minRent || 0) + '-' + (search.maxRent || 'any'));
+	}
+	
+	if (search.locations && search.locations.length) {
+		for (var location of search.locations) {
+			addToUrl('in-' + encode(location)); 
+		}
+	}
+	
+	url += '/list-' + (options.page + 1);
+
+	if (search.maxBedrooms) {
+		addQueryParam('maxBeds=' + search.maxBedrooms);
+	}
+	
+	if (search.minParks) {
+		addQueryParam('numParkingSpaces=' + search.minParks);
+	}
+	
+	if (search.minBathrooms) {
+		addQueryParam('numBaths=' + search.minBathrooms);
+	}
+	
+	return url;
 }
 
 interface ISearchResultsScrapeOptions {
