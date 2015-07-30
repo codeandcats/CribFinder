@@ -244,6 +244,9 @@ function scrape(options: { url: string, saveToDatabase: boolean }) {
 							if (scrapeCount == results.length) {
 								console.log(`Finished scraping all ${scrapeCount} properties`);
 							}
+							else {
+								console.log(`Scraped property ${scrapeCount} of ${results.length}`);
+							}
 						});
 				}
 			}
