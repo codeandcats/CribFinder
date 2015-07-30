@@ -180,7 +180,7 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 		
 		// Title & Description
 		var descriptionElement = $('#description');
-		var inspectionTimesContainer = descriptionElement.find('.inspectionTimes');
+		var inspectionTimesContainer = descriptionElement.find('#inspectionTimes');
 		var title = descriptionElement.find('p.title').text();
 		descriptionElement = descriptionElement.find('p.body');
 		
@@ -203,15 +203,15 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 		
 		// Inspection Times
 		var inspectionTimes: models.IInspectionTime[] = [];
-		var inspectionTimeElements = inspectionTimesContainer.find('a.calendar-item');
+		var inspectionTimeElements = inspectionTimesContainer.find('a.calendar-item');		
 		for (let index = 0; index < inspectionTimeElements.length; index++) {
 			let element = inspectionTimeElements[index];
+			
 			inspectionTimes.push({
 				startTime: new Date(Date.parse($(element).find('meta[itemprop="startDate"]').attr('content'))),
 				endTime: new Date(Date.parse($(element).find('meta[itemprop="endDate"]').attr('content'))),
-			}); 
+			});
 		}
-		
 		
 		var hasAirCon = 
 			(features.find('li:contains("Air Conditioning")').length > 0) ||
