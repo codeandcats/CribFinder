@@ -40,13 +40,18 @@ export function logValue(name: string, value: any, indentCount?: number) {
 		}
 		console.log(indent + ']');
 	}
-	// Object
+	// Object / Date
 	else if (valueType == 'object') {
-		console.log(prefix + '{');
-		for (var key in value) {
-			logValue(key, value[key], indentCount + 1); 
+		if (value instanceof Date) {
+			console.log(prefix + value);
 		}
-		console.log(indent + '}');
+		else {
+			console.log(prefix + '{');
+			for (var key in value) {
+				logValue(key, value[key], indentCount + 1); 
+			}
+			console.log(indent + '}');
+		}
 	}
 	// String
 	else if (valueType == 'string') {
