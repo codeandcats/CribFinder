@@ -15,7 +15,11 @@ A site for helping you find the perfect home
 5. Install TypeScript Definitions:
 > tsd install
 
-6. Compile TypeScript. I'm using Visual Studio Code to do this, though you can use install and use tsc if you prefer.
+6. Install Gulp globally. 
+> npm install gulp -g
+
+7. Run gulp to build the project
+> gulp
 
 ## Running Site
 Run:
