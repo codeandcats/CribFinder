@@ -101,7 +101,7 @@ function addProperty(): void {
 	});
 }
 
-function addSearch(defaults: { location: string; ownerEmail: string; sharedWithEmail?: string }): void {
+function addSearch(defaults: { locations: string[]; ownerEmail: string; sharedWithEmail?: string }): void {
 	database.users.findOne({ 'local.email': defaults.ownerEmail }, (err, owner) => {
 		
 		if (err) {
@@ -111,7 +111,7 @@ function addSearch(defaults: { location: string; ownerEmail: string; sharedWithE
 			console.error('Could not find owner: ' + defaults.ownerEmail);
 		}
 		else {
-			let search = getNewSearch(defaults.location);
+			let search = getNewSearch(defaults.locations);
 			
 			search.ownerId = owner._id;
 			
@@ -257,54 +257,6 @@ function scrape(options: { url: string, saveToDatabase: boolean }) {
 	}
 }
 
-switch (process.argv[2] || '') {
-	case 'clear':
-		clearTable(process.argv[3]);
-		break;
-
-	case 'list':
-		listTable(process.argv[3]);
-		break;
-
-	case 'add':
-		var tableName = String(process.argv[3] || '').toLowerCase();
-		
-		switch (tableName) {
-			case 'user':
-			case 'users':
-				addUser({
-					email: process.argv[4],
-					password: process.argv[5]
-				});
-				break;
-				
-			case 'property':
-			case 'properties':
-				addProperty();
-				break;
-			
-			case 'search':
-			case 'searches':
-				addSearch({
-					location: process.argv[4],
-					ownerEmail: process.argv[5],
-					sharedWithEmail: process.argv[6]
-				});
-				break;
-		}
-		
-	case 'scrape':
-		scrape({
-			url: process.argv[3] || '',
-			saveToDatabase: process.argv[4] == 'save'
-		});
-		break;
-
-	default:
-		console.log('Unknown args: ' + process.argv.splice(0, 2).join(' '));
-		break;
-}
-
 function getNewUser(): models.IUser {
 	return {
 		_id: database.genId(),
@@ -360,12 +312,12 @@ function getNewProperty(): models.IProperty {
 	};
 }
 
-function getNewSearch(location: string): models.ISearch {
+function getNewSearch(locations: string[]): models.ISearch {
 	
 	var search: models.ISearch = {
 		_id: null,
-		title: location,
-		location: location,
+		title: locations.join(', '),
+		locations: locations,
 		listingType: models.ListingType.Rental,
 		
 		hasAirCon: faker.random.boolean() ? undefined : faker.random.boolean(),
@@ -388,3 +340,66 @@ function getNewSearch(location: string): models.ISearch {
 	
 	return search;
 }
+
+switch (process.argv[2] || '') {
+	case 'clear':
+		clearTable(process.argv[3]);
+		break;
+
+	case 'list':
+		listTable(process.argv[3]);
+		break;
+
+	case 'add':
+		var tableName = String(process.argv[3] || '').toLowerCase();
+		
+		switch (tableName) {
+			case 'user':
+			case 'users':
+				addUser({
+					email: process.argv[4],
+					password: process.argv[5]
+				});
+				break;
+				
+			case 'property':
+			case 'properties':
+				addProperty();
+				break;
+			
+			case 'search':
+			case 'searches':
+				addSearch({
+					locations: [process.argv[4]],
+					ownerEmail: process.argv[5],
+					sharedWithEmail: process.argv[6]
+				});
+				break;
+		}
+		break;
+		
+	case 'scrape':
+		scrape({
+			url: process.argv[3] || '',
+			saveToDatabase: process.argv[4] == 'save'
+		});
+		break;
+		
+	case 'suggest':
+		scraper.getLocationSuggestions(process.argv[3], (err, results) => {
+			printer.logValue('Suggestions', results);
+		});
+		break;
+		
+	case 'url':
+		database.searches.findOne({ title: process.argv[3] }, (err, search) => {
+			var url = scraper.getSearchUrl(search);
+			printer.logValue('Url', url);
+		});
+		break;
+
+	default:
+		console.log('Unknown args: ' + process.argv.splice(0, 2).join(' '));
+		break;
+}
+
