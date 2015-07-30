@@ -3,6 +3,7 @@ var ts = require('gulp-typescript');
 var clean = require('gulp-clean');
 var browserify = require('gulp-browserify');
 var rename = require('gulp-rename');
+var runSequence = require('gulp-run-sequence');
 
 gulp.task('clean-client', function() {
 	return gulp
@@ -97,6 +98,8 @@ gulp.task('bundle-client', ['build-client', 'copy-client-libs'], function() {
 		.pipe(gulp.dest('public/scripts'));
 });
 
-gulp.task('build', ['build-server', 'bundle-client']);
+gulp.task('build', function() {
+	runSequence('bundle-client', 'build-server');
+});
 
 gulp.task('default', ['build']);
