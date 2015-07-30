@@ -82,7 +82,7 @@ export function getSearchUrl(search: models.ISearch, options?: { page?: number }
 		else {
 			url += '&';
 		}
-		url += param.toLowerCase();
+		url += param;
 	}
 	
 	function encode(value: string) {
@@ -110,8 +110,8 @@ export function getSearchUrl(search: models.ISearch, options?: { page?: number }
 		addToUrl('with-' + search.minBedrooms + '-bedroom' + (search.minBedrooms > 1 ? 's': ''));
 	}
 	
-	if (search.minRent || search.maxRent) {
-		addToUrl('between-' + (search.minRent || 0) + '-' + (search.maxRent || 'any'));
+	if (search.minPrice || search.maxPrice) {
+		addToUrl('between-' + (search.minPrice || 0) + '-' + (search.maxPrice || 'any'));
 	}
 	
 	if (search.locations && search.locations.length) {
@@ -374,7 +374,7 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 			vendorId: vendorId,
 			url: url,
 			
-			pricePerWeek: price,
+			price: price,
 			
 			bathroomCount: bathroomCount,
 			bedroomCount: bedroomCount,

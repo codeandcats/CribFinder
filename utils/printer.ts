@@ -71,7 +71,7 @@ export function logValue(name: string, value: any, indentCount?: number) {
 		var funcIndent = value.length > 40 ? indent + '\t' : indent;
 		console.log(funcIndent + funcBody.replace(/\n/gi, '\n' + funcIndent));
 	}
-	// Everything else (Numbers, Booleans, Dates, NaN, Your Mumma)
+	// Everything else (Numbers, Booleans, NaN, Your Mumma)
 	else {
 		console.log(prefix + value);
 	}

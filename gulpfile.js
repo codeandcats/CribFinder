@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var ts = require('gulp-typescript');
+var sourceMaps = require('gulp-sourcemaps')
 var clean = require('gulp-clean');
 var browserify = require('gulp-browserify');
 var rename = require('gulp-rename');
@@ -50,10 +51,12 @@ gulp.task('build-server', ['clean-server'], function() {
 			'**/*.ts',
 			'!node_modules/**/*.*'],
 			{ base: '.' })
+		.pipe(sourceMaps.init())
 		.pipe(ts(tsProject));
 		
 	var jsResult = tsResult
 		.js
+		.pipe(sourceMaps.write('.'))
 		.pipe(gulp.dest('.'));
 	
 	return jsResult;

@@ -236,8 +236,7 @@ function scrape(options: { url: string, saveToDatabase: boolean }) {
 				var scrapeCount = 0;
 				
 				for (var result of results) {
-					scrapeProperty(result.url, options.saveToDatabase, () =>
-						{
+					scrapeProperty(result.url, options.saveToDatabase, () => {
 							console.log('');
 							
 							scrapeCount++;
@@ -286,7 +285,7 @@ function getNewProperty(): models.IProperty {
 		bathroomCount: faker.random.number(1) + 1,
 		bedroomCount: faker.random.number(2) + 1,
 		bond: faker.random.number({ min: 400, max: 700 }) * 4,
-		pricePerWeek: faker.random.number({ min: 400, max: 700 }),
+		price: faker.random.number({ min: 400, max: 700 }),
 		description: faker.lorem.paragraph(),
 		inspectionTimes: [],
 		distanceToTrain: null,
@@ -335,7 +334,7 @@ function getNewSearch(locations: string[]): models.ISearch {
 		minBedrooms: faker.random.boolean() ? undefined : faker.random.number(1) + 2,
 		minParks: faker.random.boolean() ? undefined : faker.random.number(1) + 1,
 		
-		maxRent: faker.random.boolean() ? undefined : (faker.random.number(3 * 50) + 500)
+		maxPrice: faker.random.boolean() ? undefined : (faker.random.number(3 * 50) + 500)
 	};
 	
 	return search;

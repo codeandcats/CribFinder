@@ -72,7 +72,7 @@ export interface IProperty extends IPropertySearchResult, IModel {
 
 	images: IPropertyImage[];
 
-	pricePerWeek: number;
+	price: number;
 	bond: number;
 
 	bedroomCount: number;
@@ -135,8 +135,8 @@ export interface ISearch extends IModel {
 	listingType: ListingType;
 	propertyTypes?: PropertyType[];
 	
-	minRent?: number;
-	maxRent?: number;
+	minPrice?: number;
+	maxPrice?: number;
 	
 	minBedrooms?: number;
 	maxBedrooms?: number;

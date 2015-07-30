@@ -3,6 +3,7 @@
 import express = require('express');
 import passport = require('passport');
 import database = require('./data/database');
+import stringUtils = require('./utils/strings');
 
 export function map(app: express.Express) {
 	
@@ -27,6 +28,26 @@ export function map(app: express.Express) {
 		database.searches.find({ $or: [{ ownerId: userId }, { sharedWithIds: userId }] }, (err, results) => {
 			res.json(results).end();
 		});
+	});
+	
+	router.get('/searches/:title', (req, res, next) => {
+		
+		var title = stringUtils.toTitleCase(req.params.title);
+		
+		database.searches.findOne({ title: title }, (err, result) => {
+			if (err) {
+				res.status(500).write(err.message || err);
+			}
+			else {
+				if (!result) {
+					res.status(404).end();
+				}
+				else {
+					res.json(result).end();
+				}
+			}
+		});
+		
 	});
 	
 	router.get('/users/active', authRequired, function(req, res, next) {
