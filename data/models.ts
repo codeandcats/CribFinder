@@ -5,13 +5,14 @@ export interface IModel {
 }
 
 export enum ListingType {
-	Rental,
-	ForSale
+	Rental = <any>"Rental",
+	ForSale = <any>"ForSale"
 }
 
 export enum PropertyType {
 	House = <any>"House",
 	Apartment = <any>"Apartment",
+	Unit = <any>"Unit",
 	Townhouse = <any>"Townhouse",
 	Villa = <any>"Villa",
 	Other = <any>"Other"
@@ -129,7 +130,7 @@ export interface IUser extends IModel {
 export interface ISearch extends IModel {
 	title: string;
 	
-	location: string;
+	locations: string[];
 	
 	listingType: ListingType;
 	propertyTypes?: PropertyType[];
@@ -137,14 +138,11 @@ export interface ISearch extends IModel {
 	minRent?: number;
 	maxRent?: number;
 	
-	minBeds?: number;
-	maxBeds?: number;
+	minBedrooms?: number;
+	maxBedrooms?: number;
 	
 	minBathrooms?: number;
-	maxBathrooms?: number;
-	
 	minParks?: number;
-	maxParks?: number;
 	
 	hasDishwasher?: boolean;
 	hasAirCon?: boolean;
@@ -161,7 +159,6 @@ export interface ISearch extends IModel {
 	maxDistanceToTrain?: number;
 	
 	minStarRating?: number;
-	maxStarRating?: number;
 	
 	ownerId: string;
 	sharedWithIds: string[];
