@@ -15,41 +15,141 @@ export function map(app: express.Express) {
 		}
 		
 		// If they aren't authenticated then return not authorised error code
-		res.status(401).end();
+		res.send(401, 'Not Authorised');
 	}
 	
 	var router = express.Router();
 	
+	// List
 	router.get('/searches', authRequired, function(req, res, next) {
 		
 		// Find all searches owned by or shared with this user
 		var userId = req.user._id;
 		
 		database.searches.find({ $or: [{ ownerId: userId }, { sharedWithIds: userId }] }, (err, results) => {
-			res.json(results).end();
+			res.json(results);
 		});
 	});
 	
-	router.get('/searches/:title', (req, res, next) => {
+	// Get
+	router.get('/searches/:id', authRequired, (req, res, next) => {
 		
-		var title = stringUtils.toTitleCase(req.params.title);
+		var id = req.params.id;
+		var userId = req.user._id;
 		
-		database.searches.findOne({ title: title }, (err, result) => {
+		var query = {
+			$and: [
+				{ _id: id },
+				{
+					$or: [
+						{ ownerId: userId },
+						{ sharedWithIds: userId }
+					]
+				}
+			]
+		};
+		
+		database.searches.findOne({ _id: id, ownerId: userId }, (err, result) => {
 			if (err) {
 				res.status(500).write(err.message || err);
 			}
 			else {
 				if (!result) {
-					res.status(404).end();
+					res.send(404, 'Not Found');
 				}
 				else {
-					res.json(result).end();
+					res.json(result);
 				}
 			}
 		});
 		
 	});
 	
+	// Insert
+	router.post('/searches', authRequired, (req, res, next) => {
+		
+		var search = req.body;
+		search.title = stringUtils.toTitleCase(search.title);
+		search.ownerId = req.user._id;
+		
+		console.log('Inserting Search: ', search);
+		
+		database.searches.insert(search, (err, result) => {
+			if (err) {
+				res.send(500, (err && err.message) || err);
+			}
+			else {
+				if (result.n) {
+					res.send(201, 'Search created');
+				}
+				else {
+					res.send(500, 'Search not created');
+				}
+			}
+		});
+		
+	});
+	
+	// Update
+	router.put('/searches/:id', authRequired, (req, res, next) => {
+		
+		var query = {
+			$and: [
+				{ _id: req.params.id },
+				{
+					$or: [
+						{ ownerId: req.user._id },
+						{ sharedWithIds: req.user._id }
+					]
+				}
+			]
+		};
+		
+		var search = req.body;
+		search.title = stringUtils.toTitleCase(search.title);
+		search.ownerId = req.user._id;
+		
+		database.searches.update(
+			query,
+			search,
+			(err, result) => {
+				if (err) {
+					res.send(500, (err && err.message) || err);
+				}
+				else if (result.n) {
+					res.send(200, 'Search updated');
+				}
+				else {
+					res.send(404, 'Not Found');
+				}
+			});
+	});
+	
+	// Delete
+	router.delete('/searches/:id', authRequired, (req, res, next) => {
+		
+		var query = {
+			_id: req.params.id,
+			ownerId: req.user._id	
+		};
+		
+		database.searches.remove(query, (err, result) => {
+			
+			if (err) {
+				res.send(500, (err && err.message) || err);
+			}
+			else if (result.n) {
+				res.send(200, 'Search deleted');
+			}
+			else {
+				res.send(404, 'Not Found');
+			}
+			
+		});
+		
+	});
+	
+	// Get current user
 	router.get('/users/active', authRequired, function(req, res, next) {
 		
 		var userId = req.user._id;

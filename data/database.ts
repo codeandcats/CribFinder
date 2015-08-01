@@ -83,7 +83,7 @@ export class Crud<T extends models.IModel> {
 		});
 	}
 	
-	public update(query: Object, set: Object, callback: (err: Error, result: any) => any): void {
+	public update(query: Object, set: Object, callback: (err: Error, result: IUpdateResult) => any): void {
 		connect((err, db) => {
 			if (err) {
 				if (callback) {
@@ -147,9 +147,43 @@ class PropertyCrud extends Crud<models.IProperty> {
 
 export var properties = new PropertyCrud();
 
+import stringUtils = require('../utils/strings');
+
 class SearchCrud extends Crud<models.ISearch> {
 	
 	protected collectionName = 'searches';
+	
+	public findOne(query: Object, callback: (err: Error, result: models.ISearch) => any): void {
+		if (query && typeof query['title'] == 'string') {
+			query['title'] = stringUtils.toTitleCase(query['title']);
+		}
+		
+		super.findOne(query, callback);
+	}
+	
+	public find(query: Object, callback: (err: Error, results: models.ISearch[]) => any): void {
+		if (query && typeof query['title'] == 'string') {
+			query['title'] = stringUtils.toTitleCase(query['title']);
+		}
+		
+		super.find(query, callback);
+	}
+	
+	public insert(document: models.ISearch, callback: (err: Error, result: ICrudResult) => any): void {
+		if (document && typeof document.title == 'string') {
+			document.title = stringUtils.toTitleCase(document.title);
+		}
+		
+		super.insert(document, callback);
+	}
+	
+	public update(query: Object, set: Object, callback: (err: Error, result: IUpdateResult) => any): void {
+		if (set && typeof set['title'] == 'string') {
+			set['title'] = stringUtils.toTitleCase(set['title']);
+		}
+		
+		super.update(query, set, callback);
+	}
 	
 }
 
