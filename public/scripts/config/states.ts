@@ -8,17 +8,19 @@ export class StateConfig {
 		stateProvider: angular.ui.IStateProvider,
 		urlRouterProvider: angular.ui.IUrlRouterProvider) {
 
-		// For any unmatched url, route to /home
-		urlRouterProvider.otherwise('/home');		
+		// For any unmatched url, route to /
+		urlRouterProvider.otherwise('/');		
 
 		stateProvider
 			.state('home', {
-				url: '/home',
-				templateUrl: 'partials/home'
+				url: '/',
+				templateUrl: '/templates/home',
+				controller: 'home'
 			})
-			.state('search.results', {
-				url: '/search/{searchTitle}/results',
-				templateUrl: 'partials/search/results'
+			.state('search', {
+				url: '/search/:searchId',
+				templateUrl: '/templates/search',
+				controller: 'search'
 			});
 	}
 }

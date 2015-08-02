@@ -1,9 +1,9 @@
-/// <reference path="data/database.ts" />
+/// <reference path="../data/database.ts" />
 
 import express = require('express');
 import passport = require('passport');
-import database = require('./data/database');
-import stringUtils = require('./utils/strings');
+import database = require('../data/database');
+import stringUtils = require('../utils/strings');
 
 export function map(app: express.Express) {
 	
@@ -38,20 +38,16 @@ export function map(app: express.Express) {
 		var userId = req.user._id;
 		
 		var query = {
-			$and: [
-				{ _id: id },
-				{
-					$or: [
-						{ ownerId: userId },
-						{ sharedWithIds: userId }
-					]
-				}
+			_id: id,
+			$or: [
+				{ ownerId: userId },
+				{ sharedWithIds: userId }
 			]
 		};
 		
-		database.searches.findOne({ _id: id, ownerId: userId }, (err, result) => {
+		database.searches.findOne(query, (err, result) => {
 			if (err) {
-				res.status(500).write(err.message || err);
+				res.send(500, err.message || err);
 			}
 			else {
 				if (!result) {

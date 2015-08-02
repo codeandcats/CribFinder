@@ -1,6 +1,6 @@
 /// <reference path="typings/tsd.d.ts" />
-/// <reference path="api.ts" />
-/// <reference path="routes.ts" />
+/// <reference path="./routes/api.ts" />
+/// <reference path="./routes/routes.ts" />
 
 import express = require('express');
 import path = require('path');
@@ -38,10 +38,10 @@ app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 
 // Routes
-import routes = require('./routes');
+import routes = require('./routes/routes');
 routes.map(app);
 
-import api = require('./api');
+import api = require('./routes/api');
 api.map(app);
 
 // catch 404 and forward to error handler

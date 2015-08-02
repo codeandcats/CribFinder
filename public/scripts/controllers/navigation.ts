@@ -18,11 +18,11 @@ export class NavigationController {
 		private searches: resources.ISearchResource,
 		private users: resources.IUserResource) {
 		
-		this.scope.productName = 'Crib Finder 2k';
+		this.scope.productName = 'Crib Finder';
 		this.scope.searches = [];
 		this.scope.user = null;
 		
-		searches.get((results: resources.ISearch[]) => {
+		searches.list().$promise.then(results => {
 			this.scope.searches = [];
 			for (var search of results) {
 				this.scope.searches.push(search);

@@ -1,0 +1,41 @@
+nav.navbar.navbar-default(ng-controller='navigation')
+	.container-fluid
+		// Brand and toggle get grouped for better mobile display
+		.navbar-header
+			button.navbar-toggle.collapsed(type='button', data-toggle='collapse', data-target='#bs-example-navbar-collapse-1', aria-expanded='false')
+				span.sr-only Toggle navigation
+				span.icon-bar
+				span.icon-bar
+				span.icon-bar
+			a.navbar-brand(ui-sref='home') {{productName}}
+			
+		// Collect the nav links, forms, and other content for toggling
+		#bs-example-navbar-collapse-1.collapse.navbar-collapse
+			ul.nav.navbar-nav
+				li.dropdown
+					a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+						| Search 
+						span.caret
+					ul.dropdown-menu
+						li(ng-repeat='search in searches')
+							a(ui-sref='search({searchId: search._id})') {{search.title}}
+						li.divider(role='separator')
+						li
+							a(href='#') New...
+			
+			ul.nav.navbar-nav.navbar-right
+				li.dropdown
+					a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
+						| {{user.local.email}} 
+						span.caret
+						
+					ul.dropdown-menu
+						li
+							a(href='#') Action
+						li
+							a(href='#') Another action
+						li
+							a(href='#') Something else here
+						li.divider(role='separator')
+						li
+							a(href='/logout') Log out

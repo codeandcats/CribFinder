@@ -7,13 +7,15 @@ export interface ISearch extends models.ISearch, angular.resource.IResource<ISea
 }
 
 export interface ISearchResource extends angular.resource.IResourceClass<ISearch> {
+	list(): ISearch[];
 	update(ISearch) : ISearchResource;
 }
 
 export function SearchResource($resource: angular.resource.IResourceService): ISearchResource {
 	// Return the resource, include your custom actions
 	return <ISearchResource>$resource('/api/searches/:id', { id: '@id' }, {
-		get: {
+		list: {
+			method: 'GET',
 			isArray: true
 		},
 		update: {

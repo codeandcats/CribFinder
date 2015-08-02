@@ -56,14 +56,20 @@ export function map(app: express.Express) {
 	
 	
 	// Partial Views
-	router.get('/partials/home', function(req, res) {
-		res.render('partials/home');
+	router.get('/templates/:templateName', function(req, res) {
+		var path = 'templates/' + req.params.templateName;
+		res.render(path);
 	});
 	
-	router.get('/partials/search/results', function(req, res) {
-		res.render('partials/search/results');
+	/*
+	router.get('/templates/home', function(req, res) {
+		res.render('templates/home');
 	});
 	
+	router.get('/templates/search', function(req, res) {
+		res.render('templates/search');
+	});
+	*/
 	
 	app.use('/', router);
 }
