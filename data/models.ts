@@ -61,6 +61,26 @@ export interface IInspectionTime {
 	endTime: Date;
 }
 
+export enum PropertyFeature {
+	Dishwasher = <any>'Dishwasher',
+	AirCon = <any>'AirCon',
+	Balcony = <any>'Balcony',
+	Pool = <any>'Pool',
+	Gym = <any>'Gym',
+	Laundry = <any>'Laundry',
+	Furnished = <any>'Furnished'
+}
+
+export interface IPropertyFeatures {
+	dishwasher?: boolean;
+	airCon?: boolean;
+	balcony?: boolean;
+	pool?: boolean;
+	gym?: boolean;
+	laundry?: boolean;
+	furnished?: boolean;
+}
+
 export interface IProperty extends IPropertySearchResult, IModel {
 	isArchived: boolean;
 
@@ -79,13 +99,7 @@ export interface IProperty extends IPropertySearchResult, IModel {
 	bathroomCount: number;
 	parkCount: number;
 
-	hasDishwasher: boolean;
-	hasAirCon: boolean;
-	hasBalcony: boolean;
-	hasPool: boolean;
-	hasGym: boolean;
-	hasLaundry: boolean;
-	isFurnished: boolean;
+	features: IPropertyFeatures;
 
 	distanceToTram: number;
 	distanceToTrain: number;

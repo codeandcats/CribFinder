@@ -384,13 +384,15 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 			description: description,
 			inspectionTimes: inspectionTimes,
 			
-			hasAirCon: hasAirCon,
-			hasBalcony: hasBalcony,
-			hasDishwasher: hasDishwasher,
-			hasPool: hasPool,
-			hasGym: hasGym,
-			hasLaundry: hasLaundry,
-			isFurnished: isFurnished,
+			features: {
+				airCon: hasAirCon,
+				balcony: hasBalcony,
+				dishwasher: hasDishwasher,
+				pool: hasPool,
+				gym: hasGym,
+				laundry: hasLaundry,
+				furnished: isFurnished,
+			},
 			
 			distanceToTrain: null,
 			distanceToTram: null,
