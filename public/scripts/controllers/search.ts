@@ -7,25 +7,30 @@ export interface ISearchStateParams {
 	searchId: string;
 }
 
-export interface ISearchScope extends angular.IScope {
-	search: models.ISearch;
+export enum EditMode {
+	Read,
+	New,
+	Edit
 }
 
 export class SearchController {
 	
-	public static $inject = ['$scope', '$stateParams', 'searches'];
+	public static $inject = ['$stateParams', 'SearchApi'];
 	
 	constructor(
-		public scope: ISearchScope,
 		public stateParams: ISearchStateParams,
-		private searches: resources.ISearchResource) {
+		private searchApi: resources.ISearchResource) {
 		
 		// Get search from server
-		searches
+		searchApi
 			.get({ id: stateParams.searchId })
 			.$promise.then((search: models.ISearch) => {
-				this.scope.search = search;
+				this.current = search;
 			});
 	}
+	
+	public current: models.ISearch;
+	
+	public editMode = EditMode.Read;
 	
 }

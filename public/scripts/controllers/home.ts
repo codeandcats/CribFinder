@@ -2,9 +2,9 @@
 
 export class HomeController {
 	
-	public static $inject = ['$scope'];
+	public static $inject = [];
 	
-	constructor(public scope: angular.IScope) {
+	constructor() {
 		
 	}
 	

@@ -1,4 +1,4 @@
-nav.navbar.navbar-default(ng-controller='navigation')
+nav.navbar.navbar-default(ng-controller='Navigation as nav')
 	.container-fluid
 		// Brand and toggle get grouped for better mobile display
 		.navbar-header
@@ -7,7 +7,7 @@ nav.navbar.navbar-default(ng-controller='navigation')
 				span.icon-bar
 				span.icon-bar
 				span.icon-bar
-			a.navbar-brand(ui-sref='home') {{productName}}
+			a.navbar-brand(ui-sref='home') {{nav.productName}}
 			
 		// Collect the nav links, forms, and other content for toggling
 		#bs-example-navbar-collapse-1.collapse.navbar-collapse
@@ -17,7 +17,7 @@ nav.navbar.navbar-default(ng-controller='navigation')
 						| Search 
 						span.caret
 					ul.dropdown-menu
-						li(ng-repeat='search in searches')
+						li(ng-repeat='search in nav.searches')
 							a(ui-sref='search({searchId: search._id})') {{search.title}}
 						li.divider(role='separator')
 						li
@@ -26,7 +26,7 @@ nav.navbar.navbar-default(ng-controller='navigation')
 			ul.nav.navbar-nav.navbar-right
 				li.dropdown
 					a.dropdown-toggle(href='#', data-toggle='dropdown', role='button', aria-haspopup='true', aria-expanded='false')
-						| {{user.local.email}} 
+						| {{nav.user.local.email}} 
 						span.caret
 						
 					ul.dropdown-menu

@@ -1,6 +1,6 @@
+/// <reference path="../../../typings/angularjs/angular.d.ts" />
 /// <reference path="../../../typings/angularjs/angular-resource.d.ts" />
 
-import angular = require('angular');
 import models = require('../../../data/models');
 
 export interface ISearch extends models.ISearch, angular.resource.IResource<ISearch> {

@@ -1,3 +1,4 @@
+/// <reference path="../../../typings/angularjs/angular.d.ts" />
 /// <reference path="../../../typings/angular-ui-router/angular-ui-router.d.ts" />
 
 export class StateConfig {
@@ -15,12 +16,19 @@ export class StateConfig {
 			.state('home', {
 				url: '/',
 				templateUrl: '/templates/home',
-				controller: 'home'
+				controller: 'Home',
+				controllerAs: 'home'
 			})
 			.state('search', {
 				url: '/search/:searchId',
 				templateUrl: '/templates/search',
-				controller: 'search'
+				controller: 'Search',
+				controllerAs: 'search'
+			})
+			.state('search.edit', {
+				templateUrl: '/templates/searchEdit',
+				controller: 'SearchEdit',
+				controllerAs: 'search'
 			});
 	}
 }

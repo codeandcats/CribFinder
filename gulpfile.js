@@ -11,7 +11,7 @@ gulp.task('clean-client', function() {
 		.src([
 			'public/**/*.js',
 			'public/**/*.map', 
-			'!public/lib/**/*.*'],
+			'!public/libs/**/*.*'],
 			{ read: false })
 		.pipe(clean());
 });
@@ -65,12 +65,12 @@ gulp.task('build-server', ['clean-server'], function() {
 gulp.task('copy-angular', ['build-client'], function() {
 	return gulp
 		.src([
-			'node_modules/angular/angular.js',
-			'node_modules/angular/angular.min.js',
-			'node_modules/angular-resource/angular-resource.js',
-			'node_modules/angular-resource/angular-resource.min.js',
-			'node_modules/angular-ui-router/build/angular-ui-router.js',
-			'node_modules/angular-ui-router/build/angular-ui-router.min.js'])
+			'node_modules/angular/*.js',
+			'node_modules/angular/*.map',
+			'node_modules/angular-resource/*.js',
+			'node_modules/angular-resource/*.map',
+			'node_modules/angular-ui-router/build/*.js',
+			'node_modules/angular-ui-router/build/*.map'])
 		.pipe(gulp.dest('public/libs/angular'));
 });
 
@@ -91,8 +91,9 @@ gulp.task('copy-jquery', ['build-client'], function() {
 gulp.task('copy-ng-tags-input', ['build-client'], function() {
 	return gulp
 		.src([
-			'node_modules/ng-tags-input/build/**.*.js',
-			'node_modules/ng-tags-input/build/**.*.css'])
+			'node_modules/ng-tags-input/build/**/*.js',
+			'node_modules/ng-tags-input/build/**/*.map',
+			'node_modules/ng-tags-input/build/**/*.css'])
 		.pipe(gulp.dest('public/libs/ng-tags-input'));
 });
 

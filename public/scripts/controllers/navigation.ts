@@ -1,36 +1,34 @@
+/// <reference path="../../../typings/angularjs/angular.d.ts" />
+
 'use strict';
 
-import angular = require('angular');
 import models = require('../../../data/models');
 import resources = require('../services/resources');
 
-export interface INavigationScope extends angular.IScope {
-	productName: string;
-	searches: models.ISearch[];
-	user: models.IUser;
-}
-
 export class NavigationController {
-	public static $inject = ['$scope', 'searches', 'users'];
+	public static $inject = ['SearchApi', 'UserApi'];
 	
 	constructor(
-		public scope: INavigationScope,
-		private searches: resources.ISearchResource,
-		private users: resources.IUserResource) {
+		private searchApi: resources.ISearchResource,
+		private userApi: resources.IUserResource) {
 		
-		this.scope.productName = 'Crib Finder';
-		this.scope.searches = [];
-		this.scope.user = null;
+		this.productName = 'Crib Finder';
+		this.searches = [];
+		this.user = null;
 		
-		searches.list().$promise.then(results => {
-			this.scope.searches = [];
+		searchApi.list().$promise.then(results => {
+			this.searches = [];
 			for (var search of results) {
-				this.scope.searches.push(search);
+				this.searches.push(search);
 			}
 		});
 		
-		users.active().$promise.then(user => {
-			this.scope.user = user;
+		userApi.active().$promise.then(user => {
+			this.user = user;
 		});
 	}
+	
+	public productName: string;
+	public searches: models.ISearch[];
+	public user: models.IUser;
 }

@@ -1,22 +1,23 @@
-import angular = require('angular');
-import mainController = require('./controllers/main');
+/// <reference path="../../typings/angularjs/angular.d.ts" />
+
 import navigationController = require('./controllers/navigation');
 import homeController = require('./controllers/home');
 import searchController = require('./controllers/search');
+import searchEditController = require('./controllers/searchEdit');
 
 import resources = require('./services/resources');
 import states = require('./config/states');
 
 angular
-	.module('cribFinder', ['ngResource', 'ui.router'])
+	.module('cribFinder', ['ngResource', 'ui.router', 'ngTagsInput'])
 	
-	.controller('main', mainController.MainController)
-	.controller('navigation', navigationController.NavigationController)
-	.controller('home', homeController.HomeController)
-	.controller('search', searchController.SearchController)
+	.controller('Navigation', navigationController.NavigationController)
+	.controller('Home', homeController.HomeController)
+	.controller('Search', searchController.SearchController)
+	.controller('SearchEdit', searchEditController.SearchEditController)
 	
-	.factory('users', resources.UserResource)
-	.factory('searches', resources.SearchResource)
+	.factory('UserApi', resources.UserResource)
+	.factory('SearchApi', resources.SearchResource)
 	
 	.config(states.StateConfig)
 	
