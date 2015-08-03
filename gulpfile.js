@@ -88,7 +88,15 @@ gulp.task('copy-jquery', ['build-client'], function() {
 		.pipe(gulp.dest('public/libs/jquery'))
 });
 
-gulp.task('copy-client-libs', ['copy-angular', 'copy-bootstrap', 'copy-jquery']);
+gulp.task('copy-ng-tags-input', ['build-client'], function() {
+	return gulp
+		.src([
+			'node_modules/ng-tags-input/build/**.*.js',
+			'node_modules/ng-tags-input/build/**.*.css'])
+		.pipe(gulp.dest('public/libs/ng-tags-input'));
+});
+
+gulp.task('copy-client-libs', ['copy-angular', 'copy-bootstrap', 'copy-jquery', 'copy-ng-tags-input']);
 
 gulp.task('bundle-client', ['build-client', 'copy-client-libs'], function() {
 	return gulp
