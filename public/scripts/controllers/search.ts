@@ -7,12 +7,6 @@ export interface ISearchStateParams {
 	searchId: string;
 }
 
-export enum EditMode {
-	Read,
-	New,
-	Edit
-}
-
 export class SearchController {
 	
 	public static $inject = ['$stateParams', 'SearchApi'];
@@ -30,7 +24,5 @@ export class SearchController {
 	}
 	
 	public current: models.ISearch;
-	
-	public editMode = EditMode.Read;
 	
 }
