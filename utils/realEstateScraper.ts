@@ -91,27 +91,26 @@ export function getSearchUrl(search: models.ISearch, options?: { page?: number }
 	}
 	
 	if (search.propertyTypes && search.propertyTypes.length) {
-		let criteria = 'property-';
-		for (var propertyType of search.propertyTypes) {
-			if (propertyType != models.PropertyType.Other) {
-				criteria += propertyType.toString().toLowerCase();
-			}
-		}
+		
+		let criteria = 
+			'property-' + search
+			.propertyTypes.map(pt => pt.toString().toLowerCase())
+			.join('-');
 		
 		if (search.propertyTypes.indexOf(models.PropertyType.Unit) > -1 && 
 			search.propertyTypes.indexOf(models.PropertyType.Apartment) > -1) {
-			criteria += 'unit+apartment';
+			criteria += '-unit+apartment';
 		}
 		
 		addToUrl(criteria);
 	}
 	
-	if (search.minBedrooms) {
-		addToUrl('with-' + search.minBedrooms + '-bedroom' + (search.minBedrooms > 1 ? 's': ''));
+	if (search.minFeatures.bedrooms) {
+		addToUrl('with-' + search.minFeatures.bedrooms + '-bedroom' + (search.minFeatures.bedrooms > 1 ? 's': ''));
 	}
 	
-	if (search.minPrice || search.maxPrice) {
-		addToUrl('between-' + (search.minPrice || 0) + '-' + (search.maxPrice || 'any'));
+	if (search.minFeatures.price || search.maxFeatures.price) {
+		addToUrl('between-' + (search.minFeatures.price || 0) + '-' + (search.maxFeatures.price || 'any'));
 	}
 	
 	if (search.locations && search.locations.length) {
@@ -122,22 +121,22 @@ export function getSearchUrl(search: models.ISearch, options?: { page?: number }
 	
 	url += '/list-' + (options.page + 1);
 
-	if (search.maxBedrooms) {
-		addQueryParam('maxBeds=' + search.maxBedrooms);
+	if (search.maxFeatures.bedrooms) {
+		addQueryParam('maxBeds=' + search.maxFeatures.bedrooms);
 	}
 	
-	if (search.minParks) {
-		addQueryParam('numParkingSpaces=' + search.minParks);
+	if (search.minFeatures.parks) {
+		addQueryParam('numParkingSpaces=' + search.minFeatures.parks);
 	}
 	
-	if (search.minBathrooms) {
-		addQueryParam('numBaths=' + search.minBathrooms);
+	if (search.minFeatures.bathrooms) {
+		addQueryParam('numBaths=' + search.minFeatures.bathrooms);
 	}
 	
 	return url;
 }
 
-interface ISearchResultsScrapeOptions {
+export interface ISearchResultsScrapeOptions {
 	url: string;
 }
 
