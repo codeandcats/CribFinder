@@ -151,7 +151,7 @@ export function map(app: express.Express) {
 		var userId = req.user._id;
 		
 		database.users.findOne({ _id: userId }, (err, result) => {
-			delete result.local.passwordHash;
+			delete result.passwordHash;
 			res.json(result).end();
 		});
 		
