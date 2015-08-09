@@ -117,63 +117,46 @@ export interface IProperty extends IPropertySearchResult, IModel {
 }
 
 export interface IUser extends IModel {
-	local: {
-		email: string,
-		passwordHash: string
-	},
-	facebook: {
-		id: string,
-		token: string,
-		email: string,
-		name: string
-	},
-	twitter: {
-		id: string,
-		token: string,
-		displayName: string,
-		username: string
-	},
-	google: {
-		id: string,
-		token: string,
-		email: string,
-		name: string
-	}
+	email: string,
+	passwordHash: string
+}
+
+export interface ISearchMinFeatures {
+	bedrooms?: number;
+	bathrooms?: number;
+	parks?: number;
+	price?: number;
+	distanceToTram?: number;
+	distanceToTrain?: number;
+	starRating?: number;
+}
+
+export interface ISearchMaxFeatures {
+	bedrooms?: number;
+	price?: number;
+	distanceToTram?: number;
+	distanceToTrain?: number;
+	starRating?: number;
 }
 
 export interface ISearch extends IModel {
 	title: string;
 	
-	locations: string[];
-	
 	listingType: ListingType;
+	
 	propertyTypes?: PropertyType[];
 	
-	minPrice?: number;
-	maxPrice?: number;
+	locations: string[];
 	
-	minBedrooms?: number;
-	maxBedrooms?: number;
-	
-	minBathrooms?: number;
-	minParks?: number;
-	
-	hasDishwasher?: boolean;
-	hasAirCon?: boolean;
-	hasBalcony?: boolean;
-	hasPool?: boolean;
-	hasGym?: boolean;
-	hasLaundry?: boolean;
-	isFurnished?: boolean;
-	
-	minDistanceToTram?: number;
-	maxDistanceToTram?: number;
-	
-	minDistanceToTrain?: number;
-	maxDistanceToTrain?: number;
-	
-	minStarRating?: number;
-	
+	minFeatures: ISearchMinFeatures;
+	maxFeatures: ISearchMaxFeatures;
+	features: IPropertyFeatures;
+		
 	ownerId: string;
 	sharedWithIds: string[];
+}
+
+export interface ISearchProperty extends IModel {
+	searchId: string;
+	propertyId: string;
 }

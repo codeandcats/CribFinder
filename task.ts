@@ -63,13 +63,8 @@ function addUser(credentials: { email: string, password: string }) {
 	let passwordHash = database.users.generateHash(credentials.password);
 	
 	var newUser: models.IUser = {
-		local: {
-			email: credentials.email,
-			passwordHash: passwordHash
-		},
-		facebook: null,
-		google: null,
-		twitter: null
+		email: credentials.email,
+		passwordHash: passwordHash
 	};
 	
 	var table = getTable('users');
@@ -102,7 +97,7 @@ function addProperty(): void {
 }
 
 function addSearch(defaults: { locations: string[]; ownerEmail: string; sharedWithEmail?: string }): void {
-	database.users.findOne({ 'local.email': defaults.ownerEmail }, (err, owner) => {
+	database.users.findOne({ 'email': defaults.ownerEmail }, (err, owner) => {
 		
 		if (err) {
 			console.error('Error finding owner: ', err);
@@ -132,7 +127,7 @@ function addSearch(defaults: { locations: string[]; ownerEmail: string; sharedWi
 				addSearch();
 			}
 			else {
-				database.users.findOne({ 'local.email': defaults.sharedWithEmail }, (err, sharedWith) => {
+				database.users.findOne({ 'email': defaults.sharedWithEmail }, (err, sharedWith) => {
 					if (err) {
 						console.error('Error finding shared with user: ', err);
 					}
@@ -259,13 +254,8 @@ function scrape(options: { url: string, saveToDatabase: boolean }) {
 function getNewUser(): models.IUser {
 	return {
 		_id: database.genId(),
-		local: {
-			email: faker.internet.email(),
-			passwordHash: database.users.generateHash(faker.internet.password())
-		},
-		facebook: null,
-		google: null,
-		twitter: null
+		email: faker.internet.email(),
+		passwordHash: database.users.generateHash(faker.internet.password())
 	};
 }
 
@@ -320,23 +310,29 @@ function getNewSearch(locations: string[]): models.ISearch {
 		title: locations.join(', '),
 		locations: locations,
 		listingType: models.ListingType.Rental,
+		propertyTypes: [models.PropertyType.Apartment, models.PropertyType.Unit],
 		
-		hasAirCon: faker.random.boolean() ? undefined : faker.random.boolean(),
-		hasBalcony: faker.random.boolean() ? undefined : faker.random.boolean(),
-		hasDishwasher: faker.random.boolean() ? undefined : faker.random.boolean(),
-		hasGym: faker.random.boolean() ? undefined : faker.random.boolean(),
-		hasLaundry: faker.random.boolean() ? undefined : faker.random.boolean(),
-		hasPool: faker.random.boolean() ? undefined : faker.random.boolean(),
-		isFurnished: faker.random.boolean() ? undefined : faker.random.boolean(),
+		features: {
+			airCon: faker.random.boolean() ? undefined : faker.random.boolean(),
+			balcony: faker.random.boolean() ? undefined : faker.random.boolean(),
+			dishwasher: faker.random.boolean() ? undefined : faker.random.boolean(),
+			gym: faker.random.boolean() ? undefined : faker.random.boolean(),
+			laundry: faker.random.boolean() ? undefined : faker.random.boolean(),
+			pool: faker.random.boolean() ? undefined : faker.random.boolean()
+		},
+		
+		minFeatures: {
+			bedrooms: faker.random.boolean() ? undefined : faker.random.number(1) + 2,
+			bathrooms: faker.random.boolean() ? undefined : faker.random.number(1) + 1,
+			parks: faker.random.boolean() ? undefined : faker.random.number(1) + 1,
+		},
+		
+		maxFeatures: {
+			price: faker.random.boolean() ? undefined : (faker.random.number(3 * 50) + 500)
+		},
 		
 		ownerId: null,
 		sharedWithIds: [],
-		
-		minBathrooms: faker.random.boolean() ? undefined : faker.random.number(1) + 1,
-		minBedrooms: faker.random.boolean() ? undefined : faker.random.number(1) + 2,
-		minParks: faker.random.boolean() ? undefined : faker.random.number(1) + 1,
-		
-		maxPrice: faker.random.boolean() ? undefined : (faker.random.number(3 * 50) + 500)
 	};
 	
 	return search;

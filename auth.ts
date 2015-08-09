@@ -36,7 +36,7 @@ export function configure() {
 
         // Find a user whose email is the same as the forms email
         // we are checking to see if the user trying to login already exists
-        database.users.findOne({ 'local.email' :  email }, function(err, user) {
+        database.users.findOne({ 'email' :  email }, function(err, user) {
             // If there are any errors, return the error before anything else
             if (err) {
                 return done(err);
@@ -49,7 +49,7 @@ export function configure() {
 			}
 
             // If the user is found but the password is wrong
-            if (!database.users.matchesPassword(password, user.local.passwordHash)) {
+            if (!database.users.matchesPassword(password, user.passwordHash)) {
 				// Create the loginMessage and save it to session as flashdata
 				return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
 			}
@@ -79,7 +79,7 @@ export function configure() {
 			
 				// Find a user whose email is the same as the forms email
 				// we are checking to see if the user trying to login already exists
-				database.users.findOne({ 'local.email': email }, (err, user) => {
+				database.users.findOne({ 'email': email }, (err, user) => {
 					// If there are any errors, return the error
 					if (err) {
 						return done(err);
@@ -97,10 +97,8 @@ export function configure() {
 						newUser._id = database.genId();
 						
 						// Set the user's local credentials
-						newUser.local = {
-							email: email,
-							passwordHash: database.users.generateHash(password)
-						};
+						newUser.email = email;
+						newUser.passwordHash = database.users.generateHash(password);
 						
 						// Save the user
 						database.users.insert(newUser, function(err) {
