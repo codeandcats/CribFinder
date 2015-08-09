@@ -6,3 +6,53 @@ body {
 a {
 	color: #00B7FF;
 }
+
+[ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+	display: none !important;
+}
+
+.btn {
+	margin-right: 10px;
+}
+
+.btn:last-of-type {
+	margin-right: 0;
+}
+
+// -------------- TAGS ---------------
+
+tags-input .tags .tag-item .remove-button {
+	color: #eee !important;
+	
+	&:hover {
+		color: #f88 !important;
+	}
+}
+
+// -------------- FORMS ----------------
+
+.control-label {
+	text-align: left !important;
+	white-space: nowrap !important;
+}
+
+@media (max-width: 767px) {
+	.form-horizontal .control-label {
+		padding-top: 7px;
+		margin-bottom: 0;
+	}
+}
+
+.checkbox {
+	-webkit-user-select: none;
+	user-select: none;
+	
+	.control-label {
+		font-weight: bold;
+		margin-bottom: 10px;
+	}
+	
+	input {
+		margin-top: 2px;
+	}
+}
