@@ -1,17 +1,68 @@
 /// <reference path="../../../typings/angularjs/angular.d.ts" />
+/// <reference path="../../../typings/angular-ui-router/angular-ui-router.d.ts" />
 
 import searchController = require('./search');
 import models = require('../../../data/models');
 import resources = require('../services/resources');
+import objectUtils = require('../../../utils/objects');
 
-export class SearchEditController extends searchController.SearchController {
+export class SearchEditController {
+	
+	public static $inject = ['$stateParams', 'SearchApi', '$state'];
 	
 	constructor(
-		stateParams: searchController.ISearchStateParams,
-		searchApi: resources.ISearchResource) {
-			
-		super(stateParams, searchApi);
+		public stateParams: searchController.ISearchStateParams,
+		private searchApi: resources.ISearchResource,
+		private state: angular.ui.IStateService) {
 		
+		// Get search from server
+		searchApi
+			.get({ id: stateParams.searchId })
+			.$promise.then((search: models.ISearch) => {
+				this.current = search;
+			});
 	}
 	
+	public current: models.ISearch;
+	
+	public cancel(): void {
+		this.state.go('search', this.stateParams);
+	}
+	
+	public save(): void {
+		//var searchCopy = objectUtils.clone(this.current);
+		
+		//searchCopy.propertyTypes = searchCopy.propertyTypes.map((pt: any) => pt.text);  
+		//searchCopy.locations = searchCopy.locations.map((pt: any) => pt.text);
+		
+		var search = this.current;
+		
+		search.propertyTypes = search.propertyTypes.map((pt: any) => pt.text);  
+		search.locations = search.locations.map((pt: any) => pt.text);
+		(<any>search).$update(() => {
+			this.state.go('search', this.stateParams);
+		},
+		(error) => {
+			alert('Save failed\n\n' + error.message || error);
+		});
+	}
+	
+	public delete(): void {
+		if (!confirm('Hey, are you sure you want to delete this search?')) {
+			return;
+		}
+		
+		if (!confirm('You sure? Theres no turning back!')) {
+			return;
+		}
+		
+		(<any>this.current).$delete(() => {
+			this.state.go('home');
+			
+			alert('Search deleted')
+		},
+		(error) => {
+			alert('Nope! Because errors: ' + (error.message || error));
+		});
+	}
 }

@@ -61,15 +61,5 @@ export function map(app: express.Express) {
 		res.render(path);
 	});
 	
-	/*
-	router.get('/templates/home', function(req, res) {
-		res.render('templates/home');
-	});
-	
-	router.get('/templates/search', function(req, res) {
-		res.render('templates/search');
-	});
-	*/
-	
 	app.use('/', router);
 }

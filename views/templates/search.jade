@@ -1,16 +1,23 @@
-h4 {{search.current.title}}
+h4(style='display: inline-block; margin-right: 20px') {{search.current.title}}
+button.btn.btn-xs.btn-default(ng-click='search.edit()') Edit
 
-form
-	div.form-group
-		label(for='locations') Location(s)
-		tags-input(id='locations', ng-model='search.current.locations', placeholder='Location(s)')
-		//input.form-control(type="text", id="location", placeholder="Location")
+div(ng-if='search.current')
+	.row
+		.col-xs-3.col-sm-2.col-md-1 
+			label.control-label Locations
+		.col-xs-9.col-sm-10.col-md-11 {{search.current.locations.join(', ')}}
 	
-	div.form-group
-		label(for='propertyTypes') Property Type(s)
-		tags-input(id='propertyTypes', ng-model='search.current.propertyTypes', placeholder='Property Type(s)')
-		//input.form-control(type='text', id='propertyTypes', placeholder='Property Types')
-	
-	a.btn.btn-default(ui-sref='search.edit({searchId: search.current._id})') Edit
-	
-	button.btn.btn-danger Delete
+	.row
+		.col-xs-3.col-sm-2.col-md-1 
+			label.control-label Property Types
+		.col-xs-9.col-sm-10.col-md-11 {{search.current.propertyTypes.join(', ')}}
+		
+	.row(ng-if='search.featuresText()')
+		.col-xs-3.col-sm-2.col-md-1 
+			label.control-label Features
+		.col-xs-9.col-sm-10.col-md-11 {{search.featuresText()}}
+		
+	.row(ng-if='search.priceText()')
+		.col-xs-3.col-sm-2.col-md-1 
+			label.control-label Price
+		.col-xs-9.col-sm-10.col-md-11 {{search.priceText()}}

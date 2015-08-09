@@ -1,16 +1,83 @@
 h4 {{search.current.title}}
 
-form
-	div.form-group
-		label(for='locations') Location(s)
-		tags-input(id='locations', ng-model='search.current.locations', placeholder='Location(s)')
-		//input.form-control(type="text", id="location", placeholder="Location")
+form.form-horizontal(role='form', ng-if='search.current')
+	.row
+		.col-md-6
+			.form-group
+				label.control-label.col-xs-3(for='locations') Location
+				.col-xs-9
+					tags-input#locations(ng-model='search.current.locations', placeholder='Location')
 	
-	div.form-group
-		label(for='propertyTypes') Property Type(s)
-		tags-input(id='propertyTypes', ng-model='search.current.propertyTypes', placeholder='Property Type(s)')
-		//input.form-control(type='text', id='propertyTypes', placeholder='Property Types')
+		.col-md-6
+			.form-group
+				label.control-label.col-xs-3(for='propertyTypes') Property Types
+				.col-xs-9
+					tags-input#propertyTypes(ng-model='search.current.propertyTypes', placeholder='Property Types')
 	
-	button.btn.btn-primary Save
+		.col-xs-6.col-sm-3
+			.form-group
+				label.control-label.col-xs-6(for='minBedrooms') Min Beds
+				.col-xs-6
+					input.form-control#minBedrooms(ng-model='search.current.minFeatures.bedrooms', placeholder='Beds')
 	
-	button.btn.btn-default Cancel
+		.col-xs-6.col-sm-3
+			.form-group
+				label.control-label.col-xs-6(for='minBathrooms') Min Baths
+				.col-xs-6
+					input.form-control#minBathrooms(ng-model='search.current.minFeatures.bathrooms', placeholder='Baths')
+					
+		.col-xs-6.col-sm-3
+			.form-group
+				label.control-label.col-xs-6(for='minParks') Parks
+				.col-xs-6
+					input.form-control#minParks(ng-model='search.current.minFeatures.parks', placeholder='Parks')
+					
+		.col-xs-6.col-sm-3
+			.form-group
+				label.control-label.col-xs-6(for='maxPrice') Max Price
+				.col-xs-6
+					input.form-control#maxPrice(ng-model='search.current.maxFeatures.price', placeholder='Price')					
+	
+		
+		
+		.col-xs-4.col-sm-3.col-md-2
+			.checkbox
+				label.control-label
+					input#dishwasher(type='checkbox', ng-model='search.current.features.dishwasher')
+					| Dishwasher
+		
+		.col-xs-4.col-sm-3.col-md-2
+			.checkbox
+				label.control-label
+					input#aircon(type='checkbox', ng-model='search.current.features.airCon')
+					| Aircon
+					
+		.col-xs-4.col-sm-3.col-md-2
+			.checkbox
+				label.control-label
+					input#laundry(type='checkbox', ng-model='search.current.features.laundry')
+					| Laundry
+					
+		.col-xs-4.col-sm-3.col-md-2
+			.checkbox
+				label.control-label
+					input#balcony(type='checkbox', ng-model='search.current.features.balcony')
+					| Balcony
+					
+		.col-xs-4.col-sm-3.col-md-2
+			.checkbox
+				label.control-label
+					input#pool(type='checkbox', ng-model='search.current.features.pool')
+					| Pool
+					
+		.col-xs-4.col-sm-3.col-md-2
+			.checkbox
+				label.control-label
+					input#gym(type='checkbox', ng-model='search.current.features.gym')
+					| Gym
+		
+	button.btn.btn-primary(ng-click='search.save()') Save
+	
+	button.btn.btn-default(ng-click='search.cancel()') Cancel
+	
+	button.btn.btn-danger(ng-click='search.delete()') Delete

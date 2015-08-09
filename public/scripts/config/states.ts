@@ -25,7 +25,8 @@ export class StateConfig {
 				controller: 'Search',
 				controllerAs: 'search'
 			})
-			.state('search.edit', {
+			.state('searchedit', {
+				url: '/search/:searchId/edit',
 				templateUrl: '/templates/searchEdit',
 				controller: 'SearchEdit',
 				controllerAs: 'search'
