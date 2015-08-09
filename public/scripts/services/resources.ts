@@ -13,7 +13,7 @@ export interface ISearchResource extends angular.resource.IResourceClass<ISearch
 
 export function SearchResource($resource: angular.resource.IResourceService): ISearchResource {
 	// Return the resource, include your custom actions
-	return <ISearchResource>$resource('/api/searches/:id', { id: '@id' }, {
+	return <ISearchResource>$resource('/api/searches/:id', { id: '@_id' }, {
 		list: {
 			method: 'GET',
 			isArray: true
