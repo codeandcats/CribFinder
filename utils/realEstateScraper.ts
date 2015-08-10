@@ -362,6 +362,7 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 		var result: models.IProperty = {
 			
 			isArchived: false,
+			lastScrapedTime: new Date(),
 			
 			listingType: models.ListingType.Rental,
 			propertyType: propertyType,

@@ -84,6 +84,8 @@ export interface IPropertyFeatures {
 export interface IProperty extends IPropertySearchResult, IModel {
 	isArchived: boolean;
 
+	lastScrapedTime: Date;
+
 	listingType: ListingType;
 
 	propertyType: PropertyType;
