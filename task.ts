@@ -262,6 +262,7 @@ function getNewUser(): models.IUser {
 function getNewProperty(): models.IProperty {
 	return {
 		_id: database.genId(),
+		lastScrapedTime: new Date(),
 		address: {
 			unitNumber: faker.random.number(10) + 1,
 			streetNumber: faker.random.number(300) + 1,
@@ -338,6 +339,23 @@ function getNewSearch(locations: string[]): models.ISearch {
 	return search;
 }
 
+function findRows(tableName: string, queryJson: any) {
+	
+	var table = getTable(tableName);
+	
+	var query = JSON.parse(queryJson);
+	
+	table.find(query, (err, results) => {
+		if (err) {
+			console.error('Error: ', (err && err.message) || err);
+		}
+		else {
+			printer.logValue('Results', results);
+		}
+	});
+	
+}
+
 switch (process.argv[2] || '') {
 	case 'clear':
 		clearTable(process.argv[3]);
@@ -345,6 +363,10 @@ switch (process.argv[2] || '') {
 
 	case 'list':
 		listTable(process.argv[3]);
+		break;
+
+	case 'find':
+		findRows(process.argv[3], process.argv[4]);
 		break;
 
 	case 'add':
