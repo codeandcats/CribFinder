@@ -143,6 +143,23 @@ class PropertyCrud extends Crud<models.IProperty> {
 	
 	protected collectionName = 'properties';
 	
+	public search(
+		search: models.ISearch, 
+		done: (err: Error, results?: models.IProperty[]) => any) {
+		
+		done(new Error('Not Implemented'));
+		
+		var query = {};
+		
+		if (search.listingType) {
+			query['listingType'] = search.listingType;
+		}
+		
+		if (search.propertyTypes) {
+			
+		}
+	}
+	
 }
 
 export var properties = new PropertyCrud();
