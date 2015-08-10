@@ -189,5 +189,12 @@ class SearchCrud extends Crud<models.ISearch> {
 
 export var searches = new SearchCrud();
 
-
+export class AnyCrud extends Crud<any> {
+	
+	constructor(collectionName: string) {
+		this.collectionName = collectionName;
+		super();
+	}
+	
+}
 

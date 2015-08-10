@@ -27,7 +27,7 @@ function getTable(tableName: string): database.Crud<any> {
 			return database.searches;
 		
 		default:
-			return null;
+			return new database.AnyCrud(tableName);
 	}
 }
 
@@ -372,7 +372,37 @@ switch (process.argv[2] || '') {
 					sharedWithEmail: process.argv[6]
 				});
 				break;
+				
+			default:
+				var row = JSON.parse(process.argv[4]);
+				var customTable = new database.AnyCrud(tableName);
+				customTable.insert(row, (err, result) => {
+					if (err) {
+						console.log('Failed to insert row: ' + (err && err.message) || err);
+					}
+					else {
+						console.log(`Inserted ${result.n} rows into ${tableName}`);
+					}
+				});
+				break;
+				
 		}
+		break;
+		
+	case 'update':
+		var tableName = String(process.argv[3] || '').toLowerCase();
+		
+		var query = JSON.parse(process.argv[4]); 
+		var row = JSON.parse(process.argv[5]);
+		var table = new database.AnyCrud(tableName);
+		table.update(query, row, (err, result) => {
+			if (err) {
+				console.log('Failed to update row: ' + (err && err.message) || err);
+			}
+			else {
+				console.log(`Updated ${result.nModified} rows in ${tableName}`);
+			}
+		});
 		break;
 		
 	case 'scrape':
