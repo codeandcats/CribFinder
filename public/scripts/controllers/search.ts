@@ -51,22 +51,22 @@ export class SearchController {
 		
 		addFeature({
 			name: 'Bedrooms',
-			min: this.current.minFeatures.bedrooms,
-			max: this.current.maxFeatures.bedrooms
+			min: this.current.min.bedrooms,
+			max: this.current.max.bedrooms
 		});
 		
 		addFeature({
 			name: 'Bathrooms',
-			min: this.current.minFeatures.bathrooms
+			min: this.current.min.bathrooms
 		})
 		
 		addFeature({
 			name: 'Parks',
-			min: this.current.minFeatures.parks
+			min: this.current.min.parks
 		});
 		
 		for (let feature in models.PropertyFeature) {
-			if (this.current.features[stringUtils.toCamelCase(feature)]) {
+			if (this.current.has[stringUtils.toCamelCase(feature)]) {
 				result.push(feature);
 			}
 		}
@@ -79,18 +79,18 @@ export class SearchController {
 			return '';
 		}
 		
-		if (this.current.minFeatures.price) {
+		if (this.current.min.price) {
 			
-			if (this.current.maxFeatures.price) {
-				return `Between $${this.current.minFeatures.price} and $${this.current.maxFeatures.price}`;
+			if (this.current.max.price) {
+				return `Between $${this.current.min.price} and $${this.current.max.price}`;
 			}
 			else {
-				return `At least $${this.current.minFeatures.price}`;
+				return `At least $${this.current.min.price}`;
 			}
 			
 		}
-		else if (this.current.maxFeatures.price) {
-			return `At most $${this.current.maxFeatures.price}`;
+		else if (this.current.max.price) {
+			return `At most $${this.current.max.price}`;
 		}
 		else {
 			return '';

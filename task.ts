@@ -9,6 +9,7 @@ import promise = require('es6-promise');
 var Promise = promise.Promise;
 var faker = require('faker');
 import scraper = require('./utils/realEstateScraper');
+import scrapeAndSaver = require('./utils/scrapeAndSaver')
 
 //printer.configure({ maxDepth: 5 });
 
@@ -36,10 +37,10 @@ function clearTable(tableName: string) {
 	if (table) {
 		table.remove({}, (err, result) => {
 			if (err) {
-				console.log('Error: ', err);
+				printer.logError(err);
 			}
 			else {
-				console.log('Removed ' + result.n + ' ' + tableName);
+				printer.log('Removed ' + result.n + ' ' + tableName);
 			}
 		});
 	}
@@ -50,7 +51,7 @@ function listTable(tableName: string) {
 	if (table) {
 		table.find({}, (err, results) => {
 			if (err) {
-				console.log('Error: ', err);
+				printer.logError(err);
 			}
 			else {
 				printer.logValue(tableName, results);
@@ -71,13 +72,13 @@ function addUser(credentials: { email: string, password: string }) {
 	
 	table.insert(newUser, (err, result) => {
 		if (err) {
-			console.error('Error: ', err);
+			printer.logError(err);
 		}
 		else if (result.ok) {
-			console.log('Created user: ' + credentials.email);
+			printer.log('Created user: ' + credentials.email);
 		}
 		else {
-			console.error('Failed to create user for reasons');
+			printer.logError('Failed to create user for reasons');
 		}
 	});
 }
@@ -88,10 +89,10 @@ function addProperty(): void {
 	
 	table.insert(getNewProperty(), (err, result) => {
 		if (err) {
-			console.log('Error: ', err);
+			printer.logError(err);
 		}
 		else {
-			console.log('Created ' + result.n + ' properties');
+			printer.log('Created ' + result.n + ' properties');
 		}
 	});
 }
@@ -100,10 +101,10 @@ function addSearch(defaults: { locations: string[]; ownerEmail: string; sharedWi
 	database.users.findOne({ 'email': defaults.ownerEmail }, (err, owner) => {
 		
 		if (err) {
-			console.error('Error finding owner: ', err);
+			printer.logError('Error finding owner: ', err);
 		}
 		else if (!owner) {
-			console.error('Could not find owner: ' + defaults.ownerEmail);
+			printer.logError('Could not find owner: ' + defaults.ownerEmail);
 		}
 		else {
 			let search = getNewSearch(defaults.locations);
@@ -115,10 +116,10 @@ function addSearch(defaults: { locations: string[]; ownerEmail: string; sharedWi
 			function addSearch() {
 				table.insert(search, (err, result) => {
 					if (err) {
-						console.log('Error: ', err);
+						printer.logError(err);
 					}
 					else {
-						console.log('Created ' + result.n + ' searches');
+						printer.log('Created ' + result.n + ' searches');
 					}
 				});
 			}
@@ -129,10 +130,10 @@ function addSearch(defaults: { locations: string[]; ownerEmail: string; sharedWi
 			else {
 				database.users.findOne({ 'email': defaults.sharedWithEmail }, (err, sharedWith) => {
 					if (err) {
-						console.error('Error finding shared with user: ', err);
+						printer.logError('Error finding shared with user: ', err);
 					}
 					else if (!sharedWith) {
-						console.error('Could not find shared with user: ' + defaults.sharedWithEmail);
+						printer.logError('Could not find shared with user: ' + defaults.sharedWithEmail);
 					}
 					else {
 						search.sharedWithIds.push(sharedWith._id);
@@ -149,13 +150,13 @@ function addSearch(defaults: { locations: string[]; ownerEmail: string; sharedWi
 function insertProperty(property: models.IProperty, done?: () => any): void {
 	database.properties.insert(property, (err, result) => {
 		if (err) {
-			console.error("Property failed to save: ", err);
+			printer.logError("Property failed to save: ", err);
 		}
 		else if (result.n > 0) {
-			console.log("Property saved");
+			printer.log("Property saved");
 		}
 		else {
-			console.log("Property failed to save");
+			printer.logError("Property failed to save");
 		}
 	});
 }
@@ -177,20 +178,20 @@ function updateProperty(existing, update: models.IProperty, done?: () => any): v
 		update,
 		(err, result) => {
 			if (err) {
-				console.log('Failed to update property: ', err);
+				printer.logError('Failed to update property: ', err);
 			}
 			else if (result.nModified > 0) {
-				console.log('Property updated');
+				printer.log('Property updated');
 			}
 			else {
-				console.log('Property failed to update');
+				printer.log('Property failed to update');
 			}
 		});
 }
 
 function saveProperty(property: models.IProperty, done?: () => any) {
 	database.properties.findOne({ vendor: property.vendor, vendorId: property.vendorId }, (err, existing) => {
-		console.log();
+		printer.log();
 		if (!existing) {
 			insertProperty(property, done);
 		}
@@ -200,15 +201,93 @@ function saveProperty(property: models.IProperty, done?: () => any) {
 	});
 }
 
-function scrape(options: { url: string, saveToDatabase: boolean }) {
-	if (options.url.indexOf('realestate.com.au') == -1) {
-		console.error('Scrape failed, incompatible url: ', options.url);
+function scrape(idOrUrl: string, options: { saveToDatabase: boolean }) {
+	
+	if (idOrUrl.indexOf('http:') > -1) {
+		if (idOrUrl.indexOf('realestate.com.au') == -1) {
+			printer.logError('Scrape failed, incompatible url: ' + idOrUrl);
+			return;
+		}
+		else {
+			scrapeUrl(idOrUrl, options.saveToDatabase);
+		}
+	}
+	else {
+		scrapeSearch(idOrUrl, options.saveToDatabase);
+	}
+	
+	function scrapeSearch(id: string, saveToDatabase: boolean) {
+		
+		database.searches.findOne({ '_id': id }, (err, search) => {
+			if (search) {
+				let url = scraper.getSearchUrl(search);
+				
+				scrapeSearchResults(url, saveToDatabase);
+				//scrapeAndSaver.scrapeAndSaveListings(search);
+			}
+			else {
+				database.searches.findOne({ 'title': id }, (err, search) => {
+					if (search) {
+						let url = scraper.getSearchUrl(search);
+						
+						printer.log('Scraping Search: ', search.title);
+						printer.log('Url: ', url);
+						
+						//scrapeSearchResults(url, saveToDatabase);
+						
+						scrapeAndSaver.scrapeAndSaveListings(search, {
+							progress: status => printer.log(status.message),
+							done: operations => printer.log(`Finished scraping. ${operations.inserts} Inserts, ${operations.updates} Updates, ${operations.errors} Errors`)
+						});
+					}
+					else {
+						printer.logError('Scrape failed. Could not find search matching: ' + id);
+					}
+				});
+			}
+		});		
+	}
+	
+	function scrapeUrl(url: string, saveToDatabase: boolean) {
+		if (idOrUrl.indexOf('/rent/') > -1) {
+			scrapeSearchResults(idOrUrl, saveToDatabase);
+		}
+		else {
+			scrapeProperty(idOrUrl, saveToDatabase);
+		}
+	}
+	
+	function scrapeSearchResults(url: string, saveToDatabse: boolean) {
+		scraper.scrapeRentalSearchResults({ url: url }, (err, results) => {
+			if (err) {
+				printer.logError(err);
+			}
+			else {
+				printer.logValue('Listing', results);
+				
+				var scrapeCount = 0;
+				
+				for (var result of results) {
+					scrapeProperty(result.url, options.saveToDatabase, () => {
+							printer.log('');
+							
+							scrapeCount++;
+							if (scrapeCount == results.length) {
+								printer.log(`Finished scraping all ${scrapeCount} properties`);
+							}
+							else {
+								printer.log(`Scraped property ${scrapeCount} of ${results.length}`);
+							}
+						});
+				}
+			}
+		});
 	}
 	
 	function scrapeProperty(url: string, saveToDatabase: boolean, done?: () => any) {
 		scraper.scrapeRentalPropertyPage(url, (err, property) => {
 			if (err) {
-				console.error("Error scraping property: ", err);
+				printer.logError("Error scraping property: ", err);
 			}
 			else {
 				printer.logValue('Property', property);
@@ -218,36 +297,6 @@ function scrape(options: { url: string, saveToDatabase: boolean }) {
 				}
 			}
 		});
-	}
-	
-	if (options.url.indexOf('/rent/') > -1) {
-		scraper.scrapeRentalSearchResults({ url: options.url }, (err, results) => {
-			if (err) {
-				printer.logValue('Error', err);
-			}
-			else {
-				printer.logValue('Listing', results);
-				
-				var scrapeCount = 0;
-				
-				for (var result of results) {
-					scrapeProperty(result.url, options.saveToDatabase, () => {
-							console.log('');
-							
-							scrapeCount++;
-							if (scrapeCount == results.length) {
-								console.log(`Finished scraping all ${scrapeCount} properties`);
-							}
-							else {
-								console.log(`Scraped property ${scrapeCount} of ${results.length}`);
-							}
-						});
-				}
-			}
-		});
-	}
-	else {
-		scrapeProperty(options.url, options.saveToDatabase);
 	}
 }
 
@@ -288,7 +337,7 @@ function getNewProperty(): models.IProperty {
 			gym: faker.random.boolean(),
 			laundry: faker.random.boolean(),
 			pool: faker.random.boolean(),
-			furnished: faker.random.boolean(),
+			furniture: faker.random.boolean(),
 		},
 		parkCount: faker.random.number(2),
 		images: [],
@@ -313,7 +362,7 @@ function getNewSearch(locations: string[]): models.ISearch {
 		listingType: models.ListingType.Rental,
 		propertyTypes: [models.PropertyType.Apartment, models.PropertyType.Unit],
 		
-		features: {
+		has: {
 			airCon: faker.random.boolean() ? undefined : faker.random.boolean(),
 			balcony: faker.random.boolean() ? undefined : faker.random.boolean(),
 			dishwasher: faker.random.boolean() ? undefined : faker.random.boolean(),
@@ -322,13 +371,13 @@ function getNewSearch(locations: string[]): models.ISearch {
 			pool: faker.random.boolean() ? undefined : faker.random.boolean()
 		},
 		
-		minFeatures: {
+		min: {
 			bedrooms: faker.random.boolean() ? undefined : faker.random.number(1) + 2,
 			bathrooms: faker.random.boolean() ? undefined : faker.random.number(1) + 1,
 			parks: faker.random.boolean() ? undefined : faker.random.number(1) + 1,
 		},
 		
-		maxFeatures: {
+		max: {
 			price: faker.random.boolean() ? undefined : (faker.random.number(3 * 50) + 500)
 		},
 		
@@ -347,7 +396,7 @@ function findRows(tableName: string, queryJson: any) {
 	
 	table.find(query, (err, results) => {
 		if (err) {
-			console.error('Error: ', (err && err.message) || err);
+			printer.logError(err);
 		}
 		else {
 			printer.logValue('Results', results);
@@ -400,10 +449,10 @@ switch (process.argv[2] || '') {
 				var customTable = new database.AnyCrud(tableName);
 				customTable.insert(row, (err, result) => {
 					if (err) {
-						console.log('Failed to insert row: ' + (err && err.message) || err);
+						printer.logError('Failed to insert row: ', err);
 					}
 					else {
-						console.log(`Inserted ${result.n} rows into ${tableName}`);
+						printer.log(`Inserted ${result.n} rows into ${tableName}`);
 					}
 				});
 				break;
@@ -419,17 +468,16 @@ switch (process.argv[2] || '') {
 		var table = new database.AnyCrud(tableName);
 		table.update(query, row, (err, result) => {
 			if (err) {
-				console.log('Failed to update row: ' + (err && err.message) || err);
+				printer.logError('Failed to update row: ', err);
 			}
 			else {
-				console.log(`Updated ${result.nModified} rows in ${tableName}`);
+				printer.log(`Updated ${result.nModified} rows in ${tableName}`);
 			}
 		});
 		break;
 		
 	case 'scrape':
-		scrape({
-			url: process.argv[3] || '',
+		scrape(process.argv[3] || '', {
 			saveToDatabase: process.argv[4] == 'save'
 		});
 		break;
@@ -448,7 +496,7 @@ switch (process.argv[2] || '') {
 		break;
 
 	default:
-		console.log('Unknown args: ' + process.argv.splice(0, 2).join(' '));
+		printer.log('Unknown args: ' + process.argv.splice(0, 2).join(' '));
 		break;
 }
 

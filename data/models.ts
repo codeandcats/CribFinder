@@ -78,7 +78,7 @@ export interface IPropertyFeatures {
 	pool?: boolean;
 	gym?: boolean;
 	laundry?: boolean;
-	furnished?: boolean;
+	furniture?: boolean;
 }
 
 export interface IProperty extends IPropertySearchResult, IModel {
@@ -150,9 +150,9 @@ export interface ISearch extends IModel {
 	
 	locations: string[];
 	
-	minFeatures: ISearchMinFeatures;
-	maxFeatures: ISearchMaxFeatures;
-	features: IPropertyFeatures;
+	min: ISearchMinFeatures;
+	max: ISearchMaxFeatures;
+	has: IPropertyFeatures;
 		
 	ownerId: string;
 	sharedWithIds: string[];

@@ -105,12 +105,12 @@ export function getSearchUrl(search: models.ISearch, options?: { page?: number }
 		addToUrl(criteria);
 	}
 	
-	if (search.minFeatures.bedrooms) {
-		addToUrl('with-' + search.minFeatures.bedrooms + '-bedroom' + (search.minFeatures.bedrooms > 1 ? 's': ''));
+	if (search.min.bedrooms) {
+		addToUrl('with-' + search.min.bedrooms + '-bedroom' + (search.min.bedrooms > 1 ? 's': ''));
 	}
 	
-	if (search.minFeatures.price || search.maxFeatures.price) {
-		addToUrl('between-' + (search.minFeatures.price || 0) + '-' + (search.maxFeatures.price || 'any'));
+	if (search.min.price || search.max.price) {
+		addToUrl('between-' + (search.min.price || 0) + '-' + (search.max.price || 'any'));
 	}
 	
 	if (search.locations && search.locations.length) {
@@ -121,16 +121,16 @@ export function getSearchUrl(search: models.ISearch, options?: { page?: number }
 	
 	url += '/list-' + (options.page + 1);
 
-	if (search.maxFeatures.bedrooms) {
-		addQueryParam('maxBeds=' + search.maxFeatures.bedrooms);
+	if (search.max.bedrooms) {
+		addQueryParam('maxBeds=' + search.max.bedrooms);
 	}
 	
-	if (search.minFeatures.parks) {
-		addQueryParam('numParkingSpaces=' + search.minFeatures.parks);
+	if (search.min.parks) {
+		addQueryParam('numParkingSpaces=' + search.min.parks);
 	}
 	
-	if (search.minFeatures.bathrooms) {
-		addQueryParam('numBaths=' + search.minFeatures.bathrooms);
+	if (search.min.bathrooms) {
+		addQueryParam('numBaths=' + search.min.bathrooms);
 	}
 	
 	return url;
@@ -143,7 +143,7 @@ export interface ISearchResultsScrapeOptions {
 export function scrapeRentalSearchResults(
 	options: ISearchResultsScrapeOptions, 
 	callback: (err: Error, results: models.IPropertySearchResult[]) => any) {
-		
+	
 	var url = (options && options.url) || options;
 	
 	request(url, function(err, res, html) {
@@ -391,7 +391,7 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 				pool: hasPool,
 				gym: hasGym,
 				laundry: hasLaundry,
-				furnished: isFurnished,
+				furniture: isFurnished,
 			},
 			
 			distanceToTrain: null,

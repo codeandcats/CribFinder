@@ -15,7 +15,18 @@ enum SaveOperation {
 	Update = <any>'Update'
 }
 
-export function scrapeAndSaveListings(search: models.ISearch) {
+export function scrapeAndSaveListings(
+	search: models.ISearch,
+	options?: {
+		progress?: (operations: {
+			message: string
+		}) => any, 
+		done?: (operations: {
+			inserts: number,
+			updates: number,
+			errors: number
+		}) => any
+	}) {
 	
 	var url = scraper.getSearchUrl(search);
 	
@@ -25,6 +36,11 @@ export function scrapeAndSaveListings(search: models.ISearch) {
 		errors: 0
 	};
 	
+	// Defaults
+	options = options || {};
+	options.progress = options.progress || (() => {});
+	options.done = options.done || (() => {});
+	
 	scraper.scrapeRentalSearchResults(
 		{ url: url },
 		(err, listings) => {
@@ -32,20 +48,27 @@ export function scrapeAndSaveListings(search: models.ISearch) {
 				scrapeAndSaveListing(listing, (err, operation) => {
 					if (err) {
 						operations.errors++;
+						options.progress({
+							message: 'Scrape failed: ' + ((err && err.message) || err)
+						});
 					}
 					else if (operation == SaveOperation.Insert) {
 						operations.inserts++;
+						options.progress({
+							message: 'Inserted property...'
+						});
 					}
 					else if (operation == SaveOperation.Update) {
 						operations.updates++;
+						options.progress({
+							message: 'Updated property...'
+						});
 					}
 					
 					// Have we finished?
 					if (operations.errors + operations.inserts + 
 						operations.updates == listings.length) {
-						
-						rescrapeExistingPropertiesMatchingSearch(search);
-						
+						options.done(operations);
 					} 
 				});
 			}
@@ -54,7 +77,7 @@ export function scrapeAndSaveListings(search: models.ISearch) {
 
 function scrapeAndSaveListing(
 	listing: models.IPropertySearchResult,
-	done: (Error, SaveOperation?) => any) {
+	done: (err: Error, operation?: SaveOperation) => any) {
 	
 	scraper.scrapeRentalPropertyPage(listing.url, (err, property) => {
 		
@@ -87,7 +110,7 @@ function scrapeAndSaveListing(
 							done(err);
 						}
 						else {
-							done(SaveOperation.Insert);
+							done(null, SaveOperation.Insert);
 						}
 					});
 				}
@@ -122,7 +145,13 @@ function insertProperty(property: models.IProperty, done: (Error) => any) {
 	
 }
 
-function rescrapeExistingPropertiesMatchingSearch(search: models.ISearch) {
+/*
+function rescrapeExistingPropertiesMatchingSearch(
+	search: models.ISearch,
+	options: { 
+		progress: () => any,
+		done: () => any 
+	}) {
 	
 	var url = scraper.getSearchUrl(search);
 	
@@ -133,4 +162,4 @@ function rescrapeExistingPropertiesMatchingSearch(search: models.ISearch) {
 	});
 	
 }
-
+*/

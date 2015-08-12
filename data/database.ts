@@ -149,7 +149,7 @@ class PropertyCrud extends Crud<models.IProperty> {
 		
 		done(new Error('Not Implemented'));
 		
-		var query = {};
+		var query: any = {};
 		
 		if (search.listingType) {
 			query['listingType'] = search.listingType;
@@ -158,6 +158,30 @@ class PropertyCrud extends Crud<models.IProperty> {
 		if (search.propertyTypes) {
 			
 		}
+		
+		var p: models.IProperty;
+		
+		// Features
+		for (let name in search.has) {
+			if (search.has[name]) {
+				query.has = query.has || {};
+				query.has[name] = true;
+			}
+		}
+		
+		// Min Features
+		function addMinFeature(propertyName: string, amount: number) {
+			if (amount) {
+				query[propertyName] = { $gte: amount };
+			}
+		}
+		
+		addMinFeature('bedroomCount', search.min.bedrooms);
+		addMinFeature('bathroomCount', search.min.bathrooms);
+		addMinFeature('parkCount', search.min.parks);
+		addMinFeature('distanceToTrain', search.min.distanceToTrain);
+		addMinFeature('distanceToTram', search.min.distanceToTram);
+		addMinFeature('price', search.min.price);
 	}
 	
 }

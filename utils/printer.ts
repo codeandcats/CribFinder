@@ -10,6 +10,11 @@ export function configure(opts: IPrinterOptions) {
 	}
 }
 
+export function log(message?: any, ...args: any[]) {
+	var args = [message].concat(args);
+	console.log.apply(console.log, args);
+}
+
 export function logValue(name: string, value: any, indentCount?: number) {
 	
 	if (indentCount > options.maxDepth) {
@@ -76,4 +81,52 @@ export function logValue(name: string, value: any, indentCount?: number) {
 		console.log(prefix + value);
 	}
 
+}
+
+export function logError(err: Error);
+export function logError(errMessage: string);
+export function logError(message: string, err: Error);
+export function logError() {
+	
+	var err;
+	
+	switch (arguments.length) {
+		case 1:
+			let err = arguments[0];
+			if (typeof err == 'string') {
+				console.error(err);
+			}
+			else if (err instanceof Error) {
+				console.error('Error: ' + err.message);
+				if (err.stack) {
+					console.error(err.stack);
+				}
+			}
+			else {
+				console.error('Error: ' + JSON.stringify(err));
+			}
+			break;
+		
+		case 2:
+			let msg = arguments[0]
+			err = arguments[1];
+			
+			if (typeof err == 'string') {
+				console.error(msg, err);
+			}
+			else if (err instanceof Error) {
+				console.error(msg, err.message);
+				if (err.stack) {
+					console.error(err.stack);
+				}
+			}
+			else {
+				console.error(msg, JSON.stringify(err));
+			}
+			break;
+			
+		default:
+			break;
+	}
+	
 }
