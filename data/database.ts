@@ -155,10 +155,6 @@ class PropertyCrud extends Crud<models.IProperty> {
 			query['listingType'] = search.listingType;
 		}
 		
-		if (search.propertyTypes) {
-			
-		}
-		
 		var p: models.IProperty;
 		
 		// Features
@@ -182,6 +178,20 @@ class PropertyCrud extends Crud<models.IProperty> {
 		addMinFeature('distanceToTrain', search.min.distanceToTrain);
 		addMinFeature('distanceToTram', search.min.distanceToTram);
 		addMinFeature('price', search.min.price);
+		addMinFeature('starRating', search.min.starRating);
+		
+		// Max Features
+		function addMaxFeature(propertyName: string, amount: number) {
+			if (amount) {
+				query[propertyName] = { $lte: amount };
+			}
+		}
+		
+		addMaxFeature('bedroomCount', search.max.bedrooms);
+		addMaxFeature('distanceToTrain', search.max.distanceToTrain);
+		addMaxFeature('distanceToTram', search.max.distanceToTram);
+		addMaxFeature('price', search.max.price);
+		addMaxFeature('starRating', search.max.starRating);
 	}
 	
 }

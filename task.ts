@@ -10,6 +10,7 @@ var Promise = promise.Promise;
 var faker = require('faker');
 import scraper = require('./utils/realEstateScraper');
 import scrapeAndSaver = require('./utils/scrapeAndSaver')
+import geoUtils = require('./utils/geo');
 
 //printer.configure({ maxDepth: 5 });
 
@@ -405,6 +406,17 @@ function findRows(tableName: string, queryJson: any) {
 	
 }
 
+function showDistance(location1: string, location2: string) {
+	
+	geoUtils.getLatLong(location1, (err, coord) => {
+		
+		printer.logValue('coord', coord);
+		
+	});
+	
+	//https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA
+}
+
 switch (process.argv[2] || '') {
 	case 'clear':
 		clearTable(process.argv[3]);
@@ -493,6 +505,10 @@ switch (process.argv[2] || '') {
 			var url = scraper.getSearchUrl(search);
 			printer.logValue('Url', url);
 		});
+		break;
+		
+	case 'dist':
+		showDistance(process.argv[3], process.argv[4]);
 		break;
 
 	default:
