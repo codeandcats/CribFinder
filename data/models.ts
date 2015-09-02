@@ -152,7 +152,7 @@ export interface ISearch extends IModel {
 	
 	propertyTypes?: PropertyType[];
 	
-	locations: string[];
+	suburbs: ISuburb[];
 	
 	min: ISearchMinFeatures;
 	max: ISearchMaxFeatures;
