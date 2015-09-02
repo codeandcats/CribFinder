@@ -9,6 +9,7 @@ import cheerio = require('cheerio');
 import models = require('../data/models');
 import stringUtils = require('./strings');
 import propertyUtils = require('./property');
+import geoUtils = require('./geo');
 
 export interface ILocationSuggestion {
 	name: string;
@@ -113,9 +114,9 @@ export function getSearchUrl(search: models.ISearch, options?: { page?: number }
 		addToUrl('between-' + (search.min.price || 0) + '-' + (search.max.price || 'any'));
 	}
 	
-	if (search.locations && search.locations.length) {
-		for (var location of search.locations) {
-			addToUrl('in-' + encode(location)); 
+	if (search.suburbs && search.suburbs.length) {
+		for (var suburb of search.suburbs) {
+			addToUrl('in-' + encode(suburb.name + ', ' + suburb.state + ' ' + suburb.postCode)); 
 		}
 	}
 	
@@ -405,7 +406,10 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 		
 		result.starRating = propertyUtils.calculateStarRating(result);
 		
-		callback(null, <any>result);
+		geoUtils.getCoord(address, (err, coord) => {
+			result.address.coord = coord;
+			callback(err, result);
+		});
 	});
 	
 };
