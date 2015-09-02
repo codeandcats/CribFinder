@@ -50,13 +50,38 @@ export class Crud<T extends models.IModel> {
 		});
 	}
 	
-	public find(query: Object, callback: (err: Error, results: T[]) => any): void {
+	public find(query: Object, callback: (err: Error, results: T[]) => any): void;
+	public find(query: Object, options: { limit: number }, callback: (err: Error, results: T[]) => any): void;
+	public find(): void {
+		
+		var query: Object;
+		var options: { limit: number };
+		var callback: (err: Error, results: T[]) => any;
+		
+		if (arguments.length == 3) {
+			query = arguments[0];
+			options = arguments[1];
+			callback = arguments[2];
+		}
+		else {
+			query = arguments[0]; 
+			callback = arguments[1];
+		}
+		
 		connect((err, db) => {
 			if (err) {
 				callback(err, null);
 			}
 			else {
-				db.collection(this.collectionName).find(query).toArray((err, results) => {
+				var collection = db.collection(this.collectionName); 
+				
+				var find = collection.find(query);
+				
+				if (options && options.limit) {
+					find = find.limit(options.limit);
+				}
+				
+				find.toArray((err, results) => {
 					db.close();
 					callback(err, results);
 				});
@@ -230,12 +255,17 @@ class SearchCrud extends Crud<models.ISearch> {
 		super.findOne(query, callback);
 	}
 	
-	public find(query: Object, callback: (err: Error, results: models.ISearch[]) => any): void {
+	public find(query: Object, callback: (err: Error, results: models.ISearch[]) => any): void;
+	public find(query: Object, options: { limit: number }, callback: (err: Error, results: models.ISearch[]) => any): void;
+	
+	public find(): void {
+		var query = arguments[0];
+		
 		if (query && typeof query['title'] == 'string') {
 			query['title'] = stringUtils.toTitleCase(query['title']);
 		}
 		
-		super.find(query, callback);
+		super.find.apply(this, arguments);
 	}
 	
 	public insert(document: models.ISearch, callback: (err: Error, result: ICrudResult) => any): void {

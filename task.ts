@@ -51,10 +51,10 @@ function clearTable(tableName: string) {
 	}
 }
 
-function listTable(tableName: string) {
+function listTable(tableName: string, limit: string) {
 	var table = getTable(tableName || '');
 	if (table) {
-		table.find({}, (err, results) => {
+		table.find({}, { limit: limit && +limit }, (err, results) => {
 			if (err) {
 				printer.logError(err);
 			}
@@ -490,7 +490,7 @@ switch (process.argv[2] || '') {
 		break;
 
 	case 'list':
-		listTable(process.argv[3]);
+		listTable(process.argv[3], process.argv[4]);
 		break;
 
 	case 'find':
