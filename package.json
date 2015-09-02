@@ -31,7 +31,8 @@
     "jquery": "^2.1.4",
     "angular-resource": "^1.4.3",
     "angular-ui-router": "^0.2.15",
-    "ng-tags-input": "^3.0.0"
+    "ng-tags-input": "^3.0.0",
+    "fast-csv": "^0.6.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

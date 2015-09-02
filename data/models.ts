@@ -29,14 +29,18 @@ export interface IStreetInfo {
 	streetType: string;
 }
 
+export interface ICoord {
+	lat: number;
+	lng: number;
+}
+
 export interface IPropertyAddress extends IStreetInfo {
 	suburb: string;
 	postCode: string;
 	state: string;
 	country: string;
 
-	lat?: number;
-	long?: number;
+	coord?: ICoord;
 }
 
 export interface IPropertyImage {
@@ -156,6 +160,14 @@ export interface ISearch extends IModel {
 		
 	ownerId: string;
 	sharedWithIds: string[];
+}
+
+export interface ISuburb extends IModel {
+	name: string;
+	state: string;
+	postCode: string;
+	country: string;
+	coord: ICoord;
 }
 
 export interface ISearchProperty extends IModel {

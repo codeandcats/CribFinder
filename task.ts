@@ -27,6 +27,10 @@ function getTable(tableName: string): database.Crud<any> {
 		case 'search':
 		case 'searches':
 			return database.searches;
+			
+		case 'suburb':
+		case 'suburbs':
+			return database.suburbs;
 		
 		default:
 			return new database.AnyCrud(tableName);
@@ -417,6 +421,69 @@ function showDistance(location1: string, location2: string) {
 	//https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA
 }
 
+var csv = require('fast-csv');
+
+function importSuburbs(fileName?: string) {
+	fileName = fileName || 'suburbs.csv';
+	
+	var csvOptions = {
+		objectMode: true,
+		headers: true,
+		ignoreEmpty: true
+	};
+	
+	var parsedCount = 0;
+	var insertedCount = 0;
+	var hasFinished = false;
+	
+	printer.log(`Importing suburb data from "${fileName}"`);
+	
+	csv
+		.fromPath(fileName, csvOptions)
+		.on("data", function(data){
+			var suburb: models.ISuburb = {
+				_id: null,
+				name: data.suburb,
+				state: data.state && data.state.toUpperCase(),
+				postCode: data.postCode,
+				country: 'Australia',
+				coord: {
+					lat: +data.lat,
+					lng: +data.lng
+				} 
+			};
+			
+			parsedCount++;
+			
+			database.suburbs.insert(suburb, () => {
+				insertedCount++;
+				
+				if (insertedCount % 1000 == 0) {
+					printer.log(`Imported ${insertedCount} suburbs`);
+				}
+				
+				if (hasFinished && (insertedCount == parsedCount)) {
+					printer.log(`Finished. Imported ${insertedCount} suburbs.`);
+				}
+			});
+			
+		})
+		.on("end", function(){
+			hasFinished = true;
+		});
+}
+
+function importData(collectionName: string) {
+	var fileName = collectionName + '.csv';
+	
+	if (collectionName.toLowerCase() == 'suburbs') {
+		importSuburbs(fileName);
+	}
+	else {
+		printer.logError(new Error(`Cannot import into collection: "${collectionName}"`));
+	}
+}
+
 switch (process.argv[2] || '') {
 	case 'clear':
 		clearTable(process.argv[3]);
@@ -509,6 +576,10 @@ switch (process.argv[2] || '') {
 		
 	case 'dist':
 		showDistance(process.argv[3], process.argv[4]);
+		break;
+		
+	case 'import':
+		importData(process.argv[3]);
 		break;
 
 	default:

@@ -1,14 +1,10 @@
 import request = require('request');
 import printer = require('printer');
-
-export interface ILatLong {
-	lat: number;
-	lng: number;
-}
+import models = require('../data/models');
 
 export function haversineDistance(
-	coords1: ILatLong,
-	coords2: ILatLong) {
+	coords1: models.ICoord,
+	coords2: models.ICoord) {
 	
 	function toRad(x: number): number {
 		return x * Math.PI / 180;

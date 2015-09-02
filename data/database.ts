@@ -2,6 +2,7 @@
 
 'use strict';
 
+import geoUtils = require('../utils/geo');
 import mongodb = require('mongodb');
 var mongoClient = mongodb.MongoClient;
 
@@ -63,7 +64,7 @@ export class Crud<T extends models.IModel> {
 		});
 	}
 	
-	public insert(document: T, callback: (err: Error, result: ICrudResult) => any): void {
+	public insert(document: T, callback?: (err: Error, result: ICrudResult) => any): void {
 		connect((err, db) => {
 			if (err) {
 				if (callback) {
@@ -83,7 +84,7 @@ export class Crud<T extends models.IModel> {
 		});
 	}
 	
-	public update(query: Object, set: Object, callback: (err: Error, result: IUpdateResult) => any): void {
+	public update(query: Object, set: Object, callback?: (err: Error, result: IUpdateResult) => any): void {
 		connect((err, db) => {
 			if (err) {
 				if (callback) {
@@ -101,7 +102,7 @@ export class Crud<T extends models.IModel> {
 		});
 	}
 	
-	public remove(query: Object, callback: (err: Error, result: ICrudResult) => any): void {
+	public remove(query: Object, callback?: (err: Error, result: ICrudResult) => any): void {
 		connect((err, db) => {
 			if (err) {
 				if (callback) {
@@ -192,6 +193,23 @@ class PropertyCrud extends Crud<models.IProperty> {
 		addMaxFeature('distanceToTram', search.max.distanceToTram);
 		addMaxFeature('price', search.max.price);
 		addMaxFeature('starRating', search.max.starRating);
+		connect((err, db) => {
+			if (err) {
+				done(err, null);
+			}
+			else {
+				db
+					.collection(this.collectionName)
+					.find(query)
+					.toArray((err: Error, properties: models.IProperty[]) => {
+						for (var property of properties) {
+							//var distance = geoUtils.haversineDistance(property.address.)
+						}
+						db.close();
+						done(err, properties);
+					});
+			}
+		});
 	}
 	
 }
@@ -240,6 +258,7 @@ class SearchCrud extends Crud<models.ISearch> {
 
 export var searches = new SearchCrud();
 
+
 export class AnyCrud extends Crud<any> {
 	
 	constructor(collectionName: string) {
@@ -248,4 +267,13 @@ export class AnyCrud extends Crud<any> {
 	}
 	
 }
+
+
+class SuburbCrud extends Crud<models.ISuburb> {
+	
+	protected collectionName = 'suburbs';
+	
+}
+
+export var suburbs = new SuburbCrud();
 
