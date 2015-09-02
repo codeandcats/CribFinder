@@ -169,74 +169,6 @@ class PropertyCrud extends Crud<models.IProperty> {
 	
 	protected collectionName = 'properties';
 	
-	public search(
-		search: models.ISearch, 
-		done: (err: Error, results?: models.IProperty[]) => any) {
-		
-		done(new Error('Not Implemented'));
-		
-		var query: any = {};
-		
-		if (search.listingType) {
-			query['listingType'] = search.listingType;
-		}
-		
-		var p: models.IProperty;
-		
-		// Features
-		for (let name in search.has) {
-			if (search.has[name]) {
-				query.has = query.has || {};
-				query.has[name] = true;
-			}
-		}
-		
-		// Min Features
-		function addMinFeature(propertyName: string, amount: number) {
-			if (amount) {
-				query[propertyName] = { $gte: amount };
-			}
-		}
-		
-		addMinFeature('bedroomCount', search.min.bedrooms);
-		addMinFeature('bathroomCount', search.min.bathrooms);
-		addMinFeature('parkCount', search.min.parks);
-		addMinFeature('distanceToTrain', search.min.distanceToTrain);
-		addMinFeature('distanceToTram', search.min.distanceToTram);
-		addMinFeature('price', search.min.price);
-		addMinFeature('starRating', search.min.starRating);
-		
-		// Max Features
-		function addMaxFeature(propertyName: string, amount: number) {
-			if (amount) {
-				query[propertyName] = { $lte: amount };
-			}
-		}
-		
-		addMaxFeature('bedroomCount', search.max.bedrooms);
-		addMaxFeature('distanceToTrain', search.max.distanceToTrain);
-		addMaxFeature('distanceToTram', search.max.distanceToTram);
-		addMaxFeature('price', search.max.price);
-		addMaxFeature('starRating', search.max.starRating);
-		connect((err, db) => {
-			if (err) {
-				done(err, null);
-			}
-			else {
-				db
-					.collection(this.collectionName)
-					.find(query)
-					.toArray((err: Error, properties: models.IProperty[]) => {
-						for (var property of properties) {
-							//var distance = geoUtils.haversineDistance(property.address.)
-						}
-						db.close();
-						done(err, properties);
-					});
-			}
-		});
-	}
-	
 }
 
 export var properties = new PropertyCrud();
@@ -282,6 +214,74 @@ class SearchCrud extends Crud<models.ISearch> {
 		}
 		
 		super.update(query, set, callback);
+	}
+	
+	public results(
+		search: models.ISearch, 
+		done: (err: Error, results?: models.IProperty[]) => any) {
+		
+		// Include properties {searchRadius} kilometres away from centres of search suburbs 
+		var searchRadius = 5; 
+		
+		var query: any = {};
+		
+		if (search.listingType) {
+			query['listingType'] = search.listingType;
+		}
+		
+		var p: models.IProperty;
+		
+		// Features
+		for (let name in search.has) {
+			if (search.has[name]) {
+				query.features = query.has || {};
+				query.features[name] = true;
+			}
+		}
+		
+		// Min Features
+		function addMinFeature(propertyName: string, amount: number) {
+			if (amount) {
+				query[propertyName] = { $gte: amount };
+			}
+		}
+		
+		addMinFeature('bedroomCount', search.min.bedrooms);
+		addMinFeature('bathroomCount', search.min.bathrooms);
+		addMinFeature('parkCount', search.min.parks);
+		addMinFeature('distanceToTrain', search.min.distanceToTrain);
+		addMinFeature('distanceToTram', search.min.distanceToTram);
+		addMinFeature('price', search.min.price);
+		addMinFeature('starRating', search.min.starRating);
+		
+		// Max Features
+		function addMaxFeature(propertyName: string, amount: number) {
+			if (amount) {
+				query[propertyName] = { $lte: amount };
+			}
+		}
+		
+		addMaxFeature('bedroomCount', search.max.bedrooms);
+		addMaxFeature('distanceToTrain', search.max.distanceToTrain);
+		addMaxFeature('distanceToTram', search.max.distanceToTram);
+		addMaxFeature('price', search.max.price);
+		addMaxFeature('starRating', search.max.starRating);
+		
+		properties.find(query, (err: Error, properties: models.IProperty[]) => {						
+			var propertiesWithinSearchRadius = <models.IProperty[]>[];
+			
+			for (var property of properties) {
+				for (var searchSuburb of search.suburbs) {
+					var distance = geoUtils.haversineDistance(searchSuburb.coord, property.address.coord);
+					if (distance <= searchRadius) {
+						propertiesWithinSearchRadius.push(property);
+						break;
+					}
+				}
+			}
+			
+			done(err, propertiesWithinSearchRadius);
+		});
 	}
 	
 }
