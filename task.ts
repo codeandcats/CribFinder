@@ -112,41 +112,41 @@ function addSearch(defaults: { locations: string[]; ownerEmail: string; sharedWi
 			printer.logError('Could not find owner: ' + defaults.ownerEmail);
 		}
 		else {
-			let search = getNewSearch(defaults.locations);
-			
-			search.ownerId = owner._id;
-			
-			var table = getTable('searches');
-			
-			function addSearch() {
-				table.insert(search, (err, result) => {
-					if (err) {
-						printer.logError(err);
-					}
-					else {
-						printer.log('Created ' + result.n + ' searches');
-					}
-				});
-			}
-			
-			if (!defaults.sharedWithEmail) {
-				addSearch();
-			}
-			else {
-				database.users.findOne({ 'email': defaults.sharedWithEmail }, (err, sharedWith) => {
-					if (err) {
-						printer.logError('Error finding shared with user: ', err);
-					}
-					else if (!sharedWith) {
-						printer.logError('Could not find shared with user: ' + defaults.sharedWithEmail);
-					}
-					else {
-						search.sharedWithIds.push(sharedWith._id);
-					}
-					
+			getNewSearch(defaults.locations, search => {			
+				search.ownerId = owner._id;
+				
+				var table = getTable('searches');
+				
+				function addSearch() {
+					table.insert(search, (err, result) => {
+						if (err) {
+							printer.logError(err);
+						}
+						else {
+							printer.log('Created ' + result.n + ' searches');
+						}
+					});
+				}
+				
+				if (!defaults.sharedWithEmail) {
 					addSearch();
-				});
-			}
+				}
+				else {
+					database.users.findOne({ 'email': defaults.sharedWithEmail }, (err, sharedWith) => {
+						if (err) {
+							printer.logError('Error finding shared with user: ', err);
+						}
+						else if (!sharedWith) {
+							printer.logError('Could not find shared with user: ' + defaults.sharedWithEmail);
+						}
+						else {
+							search.sharedWithIds.push(sharedWith._id);
+						}
+						
+						addSearch();
+					});
+				}
+			});
 		}
 		
 	});
@@ -358,12 +358,12 @@ function getNewProperty(): models.IProperty {
 	};
 }
 
-function getNewSearch(locations: string[]): models.ISearch {
+function getNewSearch(locations: string[], callback: (search: models.ISearch) => any) {
 	
 	var search: models.ISearch = {
 		_id: null,
 		title: locations.join(', '),
-		locations: locations,
+		suburbs: [],
 		listingType: models.ListingType.Rental,
 		propertyTypes: [models.PropertyType.Apartment, models.PropertyType.Unit],
 		
@@ -390,7 +390,27 @@ function getNewSearch(locations: string[]): models.ISearch {
 		sharedWithIds: [],
 	};
 	
-	return search;
+	var errorCount = 0;
+	
+	function addSuburbToList(location: string) { 
+		database.suburbs.findOne({ name: location }, (err, suburb) => {
+			if (err) {
+				errorCount++;
+				printer.logError(new Error(`Could not find suburb: "${location}"`));
+			}
+			else {
+				search.suburbs.push(suburb);
+			}
+			
+			if (search.suburbs.length + errorCount == locations.length) {
+				callback(search);
+			}
+		});
+	}
+	
+	for (var location of locations) {
+		addSuburbToList(location);
+	}
 }
 
 function findRows(tableName: string, queryJson: any) {
@@ -398,6 +418,8 @@ function findRows(tableName: string, queryJson: any) {
 	var table = getTable(tableName);
 	
 	var query = JSON.parse(queryJson);
+	
+	printer.logValue("query", query);
 	
 	table.find(query, (err, results) => {
 		if (err) {
@@ -412,7 +434,7 @@ function findRows(tableName: string, queryJson: any) {
 
 function showDistance(location1: string, location2: string) {
 	
-	geoUtils.getLatLong(location1, (err, coord) => {
+	geoUtils.getCoord(location1, (err, coord) => {
 		
 		printer.logValue('coord', coord);
 		
@@ -433,10 +455,17 @@ function importSuburbs(fileName?: string) {
 	};
 	
 	var parsedCount = 0;
+	var skippedCount = 0;
 	var insertedCount = 0;
 	var hasFinished = false;
 	
 	printer.log(`Importing suburb data from "${fileName}"`);
+	
+	function checkFinished() {
+		if (hasFinished && (insertedCount + skippedCount == parsedCount)) {
+			printer.log(`Finished. Parsed ${parsedCount}, Imported ${insertedCount}, Ignored ${skippedCount} suburbs`);
+		}
+	}
 	
 	csv
 		.fromPath(fileName, csvOptions)
@@ -455,18 +484,21 @@ function importSuburbs(fileName?: string) {
 			
 			parsedCount++;
 			
-			database.suburbs.insert(suburb, () => {
-				insertedCount++;
-				
-				if (insertedCount % 1000 == 0) {
-					printer.log(`Imported ${insertedCount} suburbs`);
-				}
-				
-				if (hasFinished && (insertedCount == parsedCount)) {
-					printer.log(`Finished. Imported ${insertedCount} suburbs.`);
-				}
-			});
-			
+			if (!suburb.coord.lat && !suburb.coord.lng) {
+				skippedCount++;
+				checkFinished();
+			}
+			else {
+				database.suburbs.insert(suburb, () => {
+					insertedCount++;
+					
+					if (insertedCount % 1000 == 0) {
+						printer.log(`Imported ${insertedCount} suburbs`);
+					}
+					
+					checkFinished();
+				});
+			}
 		})
 		.on("end", function(){
 			hasFinished = true;
@@ -482,6 +514,14 @@ function importData(collectionName: string) {
 	else {
 		printer.logError(new Error(`Cannot import into collection: "${collectionName}"`));
 	}
+}
+
+function showListings(searchTitle: string) {
+	database.searches.findOne({ title: searchTitle }, (err, search) => {
+		database.searches.results(search, (err, properties) => {
+			printer.logValue('Search Results', properties);
+		});
+	});
 }
 
 switch (process.argv[2] || '') {
@@ -580,6 +620,12 @@ switch (process.argv[2] || '') {
 		
 	case 'import':
 		importData(process.argv[3]);
+		break;
+		
+	case 'results':
+	case 'search':
+	case 'listings':
+		showListings(process.argv[3]);
 		break;
 
 	default:
