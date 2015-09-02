@@ -29,7 +29,7 @@ export function logValue(name: string, value: any, indentCount?: number) {
 	}
 	
 	// Build prefix
-	var prefix = name ? (indent + name + ' : ') : indent;
+	var prefix = name ? (indent + name + ': ') : indent;
 	
 	var valueType = typeof value;
 	
@@ -39,11 +39,16 @@ export function logValue(name: string, value: any, indentCount?: number) {
 	}
 	// Array
 	else if (Array.isArray(value)) {
-		console.log(prefix + '[');
-		for (var index = 0; index < value.length; index++) {
-			logValue('', value[index], indentCount + 1);
+		if (!value.length) {
+			console.log(prefix + '[]');
 		}
-		console.log(indent + ']');
+		else {
+			console.log(prefix + '[');
+			for (var index = 0; index < value.length; index++) {
+				logValue('', value[index], indentCount + 1);
+			}
+			console.log(indent + ']');
+		}
 	}
 	// Object / Date
 	else if (valueType == 'object') {
