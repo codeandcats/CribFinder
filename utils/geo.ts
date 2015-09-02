@@ -32,11 +32,23 @@ export function haversineDistance(
 	return d;
 }
 
-export function getLatLong(
-	address: string,
+export function getCoord(address: string, callback: (err: Error, coord: models.ICoord) => any);
+export function getCoord(address: models.IPropertyAddress, callback: (err: Error, coord: models.ICoord) => any);
+
+export function getCoord(
+	address: string | models.IPropertyAddress,
 	done: (err: Error, latLong: any) => any)
 {
-	var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + encodeURIComponent(address);
+	var addressText: string;
+	
+	if (typeof address == 'string') {
+		addressText = <string>address;
+	}
+	else {
+		addressText = getAddressText(<models.IPropertyAddress>address);
+	}
+	
+	var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + encodeURIComponent(addressText);
 	
 	request(url, (err, res, body) => {
 		if (err) {
@@ -52,7 +64,38 @@ export function getLatLong(
 					json.results[0].geometry &&
 					json.results[0].geometry.location;  
 		
-		done(null, coord); 
+		if (!coord) {
+			err = new Error(`Failed to retrieve coords for: ${addressText}`);
+		}
+		
+		done(err, coord); 
 	});
+}
+
+export function getAddressText(
+	address: models.IPropertyAddress,
+	options?: { includeCountry: boolean }): string {
+		
+	var result = '';
+	
+	if (address.unitNumber) {
+		result = address.unitNumber + ', ';
+	}
+	
+	result += `${address.streetNumber} ${address.streetName} ${address.streetType}`; 
+	
+	if (address.suburb) {
+		result += `, ${address.suburb}`;
+	}
+	
+	if (address.state) {
+		result += `, ${address.state} ${address.postCode}`; 
+	}
+	
+	if (options && options.includeCountry) {
+		result += `, ${address.country}`;
+	}
+	
+	return result;
 }
 
