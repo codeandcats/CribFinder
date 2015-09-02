@@ -6,7 +6,7 @@ form.form-horizontal(role='form', ng-if='search.current')
 			.form-group
 				label.control-label.col-xs-3(for='locations') Location
 				.col-xs-9
-					tags-input#locations(ng-model='search.current.locations', placeholder='Location')
+					tags-input#locations(ng-model='search.current.locations', placeholder='Location', replace-spaces-with-dashes='false', display-property='name')
 	
 		.col-md-6
 			.form-group

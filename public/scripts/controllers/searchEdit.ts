@@ -16,11 +16,7 @@ export class SearchEditController {
 		private state: angular.ui.IStateService) {
 		
 		// Get search from server
-		searchApi
-			.get({ id: stateParams.searchId })
-			.$promise.then((search: models.ISearch) => {
-				this.current = search;
-			});
+		this.current = searchApi.get({ id: stateParams.searchId });
 	}
 	
 	public current: models.ISearch;
@@ -37,8 +33,8 @@ export class SearchEditController {
 		
 		var search = this.current;
 		
-		search.propertyTypes = search.propertyTypes.map((pt: any) => pt.text);  
-		search.locations = search.locations.map((pt: any) => pt.text);
+		search.propertyTypes = search.propertyTypes.map((pt: any) => pt.text);
+		//search.su = search.locations.map((pt: any) => pt.text);
 		(<any>search).$update(() => {
 			this.state.go('search', this.stateParams);
 		},

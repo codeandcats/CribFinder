@@ -19,13 +19,7 @@ export class SearchController {
 		private timeout: angular.ITimeoutService) {
 		
 		// Get search from server
-		searchApi
-			.get({ id: stateParams.searchId })
-			.$promise.then((search: models.ISearch) => {
-				timeout(() => {
-					this.current = search;
-				});
-			});
+		this.current = searchApi.get({ id: stateParams.searchId });
 	}
 	
 	public current: models.ISearch;
