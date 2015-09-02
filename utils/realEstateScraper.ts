@@ -212,7 +212,12 @@ export function getStreetInfo(street: string): models.IStreetInfo {
 	var streetType = parts[parts.length - 1];
 	parts.splice(parts.length - 1);
 	
-	var streetName = parts.join(' ');
+	var streetName = parts.join(' ') || '';
+	
+	if (streetName.toLowerCase() == 'the') {
+		streetName += ' ' + streetType;
+		streetType = '';
+	}
 	
 	var info: models.IStreetInfo = {
 		streetNumber: streetNumber,

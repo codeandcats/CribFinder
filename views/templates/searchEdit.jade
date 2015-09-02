@@ -1,7 +1,10 @@
-h4 {{search.current.title}}
-
 form.form-horizontal(role='form', ng-if='search.current')
 	.row
+		.col-xs-12
+			.form-group.form-group-lg
+				.col-xs-12.col-md-6
+					input.form-control#title(ng-model='search.current.title', placeholder='Title')
+		
 		.col-md-6
 			.form-group
 				label.control-label.col-xs-3(for='locations') Location

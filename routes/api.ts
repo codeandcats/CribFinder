@@ -34,14 +34,11 @@ export function map(app: express.Express) {
 	// Get
 	router.get('/searches/:id', authRequired, (req, res, next) => {
 		
-		var id = req.params.id;
-		var userId = req.user._id;
-		
 		var query = {
-			_id: id,
+			_id: req.params.id,
 			$or: [
-				{ ownerId: userId },
-				{ sharedWithIds: userId }
+				{ ownerId: req.user._id },
+				{ sharedWithIds: req.user._id }
 			]
 		};
 		
@@ -141,6 +138,35 @@ export function map(app: express.Express) {
 				res.send(404, 'Not Found');
 			}
 			
+		});
+		
+	});
+	
+	// Search Results
+	router.get('/searches/:id/results', authRequired, (req, res, next) => {
+		
+		var query = {
+			_id: req.params.id,
+			$or: [
+				{ ownerId: req.user._id },
+				{ sharedWithIds: req.user._id }
+			]
+		};
+		
+		database.searches.findOne(query, (err, result) => {
+			if (err) {
+				res.send(500, err.message || err);
+			}
+			else {
+				if (!result) {
+					res.send(404, 'Not Found');
+				}
+				else {
+					database.searches.results(result, (err, properties) => {
+						res.json(properties);
+					});
+				}
+			}
 		});
 		
 	});

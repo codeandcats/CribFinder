@@ -13,19 +13,8 @@ export class NavigationController {
 		private userApi: resources.IUserResource) {
 		
 		this.productName = 'Crib Finder';
-		this.searches = [];
-		this.user = null;
-		
-		searchApi.list().$promise.then(results => {
-			this.searches = [];
-			for (var search of results) {
-				this.searches.push(search);
-			}
-		});
-		
-		userApi.active().$promise.then(user => {
-			this.user = user;
-		});
+		this.searches = searchApi.list();
+		this.user = userApi.active();
 	}
 	
 	public productName: string;

@@ -200,17 +200,61 @@ class SearchCrud extends Crud<models.ISearch> {
 		super.find.apply(this, arguments);
 	}
 	
-	public insert(document: models.ISearch, callback: (err: Error, result: ICrudResult) => any): void {
-		if (document && typeof document.title == 'string') {
-			document.title = stringUtils.toTitleCase(document.title);
+	private strToInt(value: string | number): number {
+		if (typeof value == 'string') {
+			return parseInt(<string>value, 10);
 		}
-		
-		super.insert(document, callback);
+		else {
+			return <number>value;
+		}
 	}
 	
-	public update(query: Object, set: Object, callback: (err: Error, result: IUpdateResult) => any): void {
-		if (set && typeof set['title'] == 'string') {
-			set['title'] = stringUtils.toTitleCase(set['title']);
+	private strToFloat(value: string | number): number {
+		if (typeof value == 'string') {
+			return parseFloat(<string>value);
+		}
+		else {
+			return <number>value;
+		}
+	}
+	
+	public cleanse(search: models.ISearch): models.ISearch {
+		if (typeof search.title == 'string') {
+			search.title = stringUtils.toTitleCase(search.title);
+		}
+		
+		if (search.min) {
+			search.min.price = this.strToInt(search.min.price);
+			search.min.bathrooms = this.strToInt(search.min.bathrooms);
+			search.min.bedrooms = this.strToInt(search.min.bedrooms);
+			search.min.distanceToTrain = this.strToFloat(search.min.distanceToTrain);
+			search.min.distanceToTram = this.strToFloat(search.min.distanceToTram);
+			search.min.parks = this.strToInt(search.min.parks);
+			search.min.starRating = this.strToInt(search.min.starRating);
+		}
+		
+		if (search.max) {
+			search.max.price = this.strToInt(search.max.price);
+			search.max.bedrooms = this.strToInt(search.max.bedrooms);
+			search.max.distanceToTrain = this.strToFloat(search.max.distanceToTrain);
+			search.max.distanceToTram = this.strToFloat(search.max.distanceToTram);
+			search.max.starRating = this.strToInt(search.max.starRating);
+		}
+		
+		return search;
+	}
+	
+	public insert(search: models.ISearch, callback: (err: Error, result: ICrudResult) => any): void {
+		if (search) {
+			this.cleanse(search);
+		}
+		
+		super.insert(search, callback);
+	}
+	
+	public update(query: Object, set: models.ISearch, callback: (err: Error, result: IUpdateResult) => any): void {
+		if (set) {
+			this.cleanse(set);
 		}
 		
 		super.update(query, set, callback);

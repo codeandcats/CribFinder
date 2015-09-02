@@ -4,6 +4,7 @@ import navigationController = require('./controllers/navigation');
 import homeController = require('./controllers/home');
 import searchController = require('./controllers/search');
 import searchEditController = require('./controllers/searchEdit');
+import searchListingController = require('./controllers/searchListing');
 
 import resources = require('./services/resources');
 import states = require('./config/states');
@@ -15,6 +16,7 @@ angular
 	.controller('Home', homeController.HomeController)
 	.controller('Search', searchController.SearchController)
 	.controller('SearchEdit', searchEditController.SearchEditController)
+	.controller('SearchListing', searchListingController.SearchListingController)
 	
 	.factory('UserApi', resources.UserResource)
 	.factory('SearchApi', resources.SearchResource)

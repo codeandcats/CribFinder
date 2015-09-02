@@ -1,4 +1,5 @@
 /// <reference path="../../../typings/angularjs/angular.d.ts" />
+/// <reference path="../../../data/models.ts" />
 
 import models = require('../../../data/models');
 import resources = require('../services/resources');

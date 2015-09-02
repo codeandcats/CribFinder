@@ -1,0 +1,6 @@
+div(ng-controller='SearchListing as listing')
+	h4 Search Results
+
+	button(ng-click='listing.showResults()') Show Results
+
+	| {{listing.results.length}} properties found. 
