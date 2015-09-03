@@ -4,7 +4,7 @@
 import models = require('../../../data/models');
 
 export interface ISearch extends models.ISearch, angular.resource.IResource<ISearch> {
-	$listing(): IProperty[];
+	$listings(): IProperty[];
 }
 
 export interface IProperty extends models.IProperty, angular.resource.IResource<IProperty> {
@@ -13,7 +13,7 @@ export interface IProperty extends models.IProperty, angular.resource.IResource<
 export interface ISearchResource extends angular.resource.IResourceClass<ISearch> {
 	list(): ISearch[];
 	update(search: models.ISearch) : ISearchResource;
-	listing(search: models.ISearch): IProperty[];
+	listings(search: models.ISearch): IProperty[];
 }
 
 export function SearchResource($resource: angular.resource.IResourceService): ISearchResource {
@@ -32,7 +32,7 @@ export function SearchResource($resource: angular.resource.IResourceService): IS
 				method: 'PUT',
 				isArray: false
 			},
-			listing: {
+			listings: {
 				method: 'GET',
 				isArray: true,
 				url: '/api/searches/:id/results',

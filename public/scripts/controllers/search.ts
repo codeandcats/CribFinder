@@ -46,23 +46,25 @@ export class SearchController {
 		
 		addFeature({
 			name: 'Bedrooms',
-			min: this.current.min.bedrooms,
-			max: this.current.max.bedrooms
+			min: this.current.min && this.current.min.bedrooms,
+			max: this.current.max && this.current.max.bedrooms
 		});
 		
 		addFeature({
 			name: 'Bathrooms',
-			min: this.current.min.bathrooms
+			min: this.current.min && this.current.min.bathrooms
 		})
 		
 		addFeature({
 			name: 'Parks',
-			min: this.current.min.parks
+			min: this.current.min && this.current.min.parks
 		});
 		
-		for (let feature in models.PropertyFeature) {
-			if (this.current.has[stringUtils.toCamelCase(feature)]) {
-				result.push(feature);
+		if (this.current.has) {
+			for (let feature in models.PropertyFeature) {
+				if (this.current.has[stringUtils.toCamelCase(feature)]) {
+					result.push(feature);
+				}
 			}
 		}
 		
@@ -74,9 +76,9 @@ export class SearchController {
 			return '';
 		}
 		
-		if (this.current.min.price) {
+		if (this.current.min && this.current.min.price) {
 			
-			if (this.current.max.price) {
+			if (this.current.max && this.current.max.price) {
 				return `Between $${this.current.min.price} and $${this.current.max.price}`;
 			}
 			else {
@@ -84,7 +86,7 @@ export class SearchController {
 			}
 			
 		}
-		else if (this.current.max.price) {
+		else if (this.current.max && this.current.max.price) {
 			return `At most $${this.current.max.price}`;
 		}
 		else {
