@@ -2,6 +2,8 @@
 /// <reference path="../../../typings/angular-ui-router/angular-ui-router.d.ts" />
 /// <reference path="../../../data/models.ts" />
 
+'use strict';
+
 import models = require('../../../data/models');
 import searchController = require('./search');
 import resources = require('../services/resources');

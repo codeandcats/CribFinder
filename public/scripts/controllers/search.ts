@@ -1,6 +1,8 @@
 /// <reference path="../../../typings/angularjs/angular.d.ts" />
 /// <reference path="../../../data/models.ts" />
 
+'use strict';
+
 import models = require('../../../data/models');
 import resources = require('../services/resources');
 import stringUtils = require('../../../utils/strings');

@@ -1,3 +1,5 @@
+'use strict';
+
 /// <reference path="../../typings/angularjs/angular.d.ts" />
 
 import navigationController = require('./controllers/navigation');
