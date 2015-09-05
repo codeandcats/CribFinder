@@ -50,26 +50,40 @@ export function getCoord(
 	
 	var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + encodeURIComponent(addressText);
 	
-	request(url, (err, res, body) => {
-		if (err) {
-			done(err, null);
-			return;
-		}
-		
-		var json = JSON.parse(body);
-		
-		var coord = json &&
-					json.results &&
-					json.results[0] &&
-					json.results[0].geometry &&
-					json.results[0].geometry.location;  
-		
-		if (!coord) {
-			err = new Error(`Failed to retrieve coords for: ${addressText}`);
-		}
-		
-		done(err, coord); 
-	});
+	function performLookup(retryCount: number) {
+		request(url, (err, res, body) => {
+			if (err) {
+				done(err, null);
+				return;
+			}
+			
+			var json = JSON.parse(body);
+			
+			var coord = json &&
+						json.results &&
+						json.results[0] &&
+						json.results[0].geometry &&
+						json.results[0].geometry.location;  
+			
+			if (!coord) {
+				if (retryCount > 0) {
+					setTimeout(() => {
+						performLookup(retryCount - 1);
+					},
+					100);
+				}
+				else {
+					err = new Error(`Failed to retrieve coords for: ${addressText}`);
+					done(err, null);
+				}
+			}
+			else {
+				done(null, coord);
+			} 
+		});
+	}
+	
+	performLookup(3);
 }
 
 export function getAddressText(
