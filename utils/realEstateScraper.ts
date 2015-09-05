@@ -365,6 +365,14 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 		
 		var isFurnished = (description.search(/([^n]|^)furnished/gi) > -1);
 		
+		var images: models.IPropertyImage[] = [];
+		$('.thumbs').find('.thumb img').each((i, image) => {
+			var imageUrl = $(image).attr('src');
+			if (imageUrl) {
+				images.push({ url: imageUrl });
+			}
+		});
+		
 		var result: models.IProperty = {
 			
 			isArchived: false,
@@ -402,7 +410,7 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 			
 			distanceToTrain: null,
 			distanceToTram: null,
-			images: [],
+			images: images,
 			overriddenFields: [],
 			starRating: null,
 			
