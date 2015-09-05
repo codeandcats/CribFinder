@@ -102,7 +102,6 @@ export function logError() {
 				console.error(err);
 			}
 			else if (err instanceof Error) {
-				console.error('Error: ' + err.message);
 				if (err.stack) {
 					console.error(err.stack);
 				}
