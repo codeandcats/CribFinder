@@ -12,6 +12,8 @@ export class SearchEditController {
 	
 	public static $inject = ['$stateParams', 'SearchApi', '$state'];
 	
+	public models;
+	
 	constructor(
 		public stateParams: searchController.ISearchStateParams,
 		private searchApi: resources.ISearchResource,
@@ -19,6 +21,8 @@ export class SearchEditController {
 		
 		// Get search from server
 		this.current = searchApi.get({ id: stateParams.searchId });
+		
+		this.models = models;
 	}
 	
 	public current: models.ISearch;

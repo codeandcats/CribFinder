@@ -32,17 +32,17 @@ export class SearchController {
 			return '';
 		}
 		
-		var result = [];
+		var descriptions = [];
 		
 		function addFeature(feature: { name: string; min?: number; max?: number }) {
 			if (feature.min && feature.max) {
-				result.push(`Between ${feature.min} and ${feature.max} ${feature.name}`);
+				descriptions.push(`Between ${feature.min} and ${feature.max} ${feature.name}`);
 			}
 			else if (feature.min) {
-				result.push(`At least ${feature.min} ${feature.name}`);
+				descriptions.push(`At least ${feature.min} ${feature.name}`);
 			}
 			else if (feature.max) {
-				result.push(`At most ${feature.max} ${feature.name}`);
+				descriptions.push(`At most ${feature.max} ${feature.name}`);
 			}
 		}
 		
@@ -62,15 +62,42 @@ export class SearchController {
 			min: this.current.min && this.current.min.parks
 		});
 		
-		if (this.current.has) {
+		var mustHaves = <models.PropertyFeature[]>[];
+		var niceToHaves = <models.PropertyFeature[]>[];
+		
+		if (this.current.features) {
 			for (let feature in models.PropertyFeature) {
-				if (this.current.has[stringUtils.toCamelCase(feature)]) {
-					result.push(feature);
+				feature = stringUtils.toCamelCase(feature);
+				
+				switch (this.current.features[feature]) {
+					case models.SearchFeatureImportance.MustHave:
+						mustHaves.push(feature);
+						break;
+						
+					case models.SearchFeatureImportance.NiceToHave:
+						niceToHaves.push(feature);
+						break; 
 				}
 			}
 		}
 		
-		return result.join(', ');
+		var result = descriptions.join(', ');
+		
+		if (result) {
+			result += '. ';
+		}
+		
+		if (mustHaves.length) {
+			result += 'Must haves: ' + mustHaves.join(', ') + '. ';
+		}
+		
+		if (niceToHaves.length) {
+			result += 'Nice to haves: ' + niceToHaves.join(', ') + '.';
+		}
+		
+		result = result.trim();
+		
+		return result;
 	}
 	
 	public priceText() {

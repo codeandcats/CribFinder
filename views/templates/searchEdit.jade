@@ -41,39 +41,51 @@ form.form-horizontal(role='form', ng-if='search.current')
 				.col-xs-6
 					input.form-control#maxPrice(ng-model='search.current.max.price', placeholder='Price')					
 	
-		
-		
-		.col-xs-4.col-sm-3.col-md-2
+		.col-xs-12
+			table.table
+				thead
+					tr
+						th Feature
+						th Don't Care
+						th Nice To Have
+						th Must Have
+					
+					tr(ng-repeat='(feature, featureValue) in search.current.features')
+						td {{feature}}
+						td(ng-repeat='(importance, importanceValue) in search.models.SearchFeatureImportance')
+							input(type='radio', name='{{feature}}', value='{{importance}}')
+					
+		//.col-xs-4.col-sm-3.col-md-2
 			.checkbox
 				label.control-label
 					input#dishwasher(type='checkbox', ng-model='search.current.has.dishwasher')
 					| Dishwasher
 		
-		.col-xs-4.col-sm-3.col-md-2
+		//.col-xs-4.col-sm-3.col-md-2
 			.checkbox
 				label.control-label
 					input#aircon(type='checkbox', ng-model='search.current.has.airCon')
 					| Aircon
 					
-		.col-xs-4.col-sm-3.col-md-2
+		//.col-xs-4.col-sm-3.col-md-2
 			.checkbox
 				label.control-label
 					input#laundry(type='checkbox', ng-model='search.current.has.laundry')
 					| Laundry
 					
-		.col-xs-4.col-sm-3.col-md-2
+		//.col-xs-4.col-sm-3.col-md-2
 			.checkbox
 				label.control-label
 					input#balcony(type='checkbox', ng-model='search.current.has.balcony')
 					| Balcony
 					
-		.col-xs-4.col-sm-3.col-md-2
+		//.col-xs-4.col-sm-3.col-md-2
 			.checkbox
 				label.control-label
 					input#pool(type='checkbox', ng-model='search.current.has.pool')
 					| Pool
 					
-		.col-xs-4.col-sm-3.col-md-2
+		//.col-xs-4.col-sm-3.col-md-2
 			.checkbox
 				label.control-label
 					input#gym(type='checkbox', ng-model='search.current.has.gym')
