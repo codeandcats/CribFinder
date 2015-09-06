@@ -1,6 +1,18 @@
 div(ng-controller='SearchListing as listing')
-	h4 Search Results for {{listing.search.title}}
-
-	button(ng-click='listing.showResults()') Show Results
-
-	| {{listing.results.length}} properties found. 
+	h4.search-results-title Search Results
+	
+	p.search-results-count {{listing.results.length}} properties found.
+	
+	div(class='search-results', ng-repeat='property in listing.results')
+		div(class='search-result panel panel-default')
+			div.panel-heading
+				h4 {{property.title}}
+				
+			div.panel-body
+				div.row
+					div.col-md-4
+						div.thumbnail(href="#")
+							img(ng-if='property.images.length', ng-src='{{property.images[0].url}}')
+					
+					div.col-md-8
+						{{property.description}}
