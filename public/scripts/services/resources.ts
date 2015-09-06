@@ -6,21 +6,41 @@
 import models = require('../../../data/models');
 
 export interface ISearch extends models.ISearch, angular.resource.IResource<ISearch> {
-	$listings(): IProperty[];
 }
 
 export interface IProperty extends models.IProperty, angular.resource.IResource<IProperty> {
 }
 
+export interface IPropertyResource extends angular.resource.IResourceClass<IProperty> {
+}
+
+export function PropertyResource($resource: angular.resource.IResourceService): IPropertyResource {
+	return <IPropertyResource>$resource(
+		'/api/property/:id', 
+		{
+			id: '@_id'
+		});
+}
+
+PropertyResource.$inject = ['$resource'];
+
+
+
 export interface ISearchResource extends angular.resource.IResourceClass<ISearch> {
 	list(): ISearch[];
 	update(search: models.ISearch) : ISearchResource;
-	listings(search: models.ISearch): IProperty[];
+	results(search: models.ISearch, callback: (err: Error, properties: IProperty[]) => any): void;
+	//listings(search: models.ISearch): IProperty[];
 }
 
-export function SearchResource($resource: angular.resource.IResourceService): ISearchResource {
+export function SearchResource(
+	$resource: angular.resource.IResourceService,
+	$http: angular.IHttpService,
+	$q: angular.IQService,
+	properties: IPropertyResource): ISearchResource {
+		
 	// Return the resource, include your custom actions
-	return <ISearchResource>$resource(
+	var resource = <ISearchResource>$resource(
 		'/api/searches/:id',
 		{
 			id: '@_id'
@@ -33,7 +53,7 @@ export function SearchResource($resource: angular.resource.IResourceService): IS
 			update: {
 				method: 'PUT',
 				isArray: false
-			},
+			}/*,
 			listings: {
 				method: 'GET',
 				isArray: true,
@@ -41,11 +61,28 @@ export function SearchResource($resource: angular.resource.IResourceService): IS
 				params: {
 					id: '@_id'
 				}
-			}
+			}*/
 		});
+		
+	resource.results = (search, callback) => {
+		
+		$http.get(`/api/searches/${search._id}/results`).then(response => {
+			var results: IProperty[] = [];
+			
+			for (var property of <models.IProperty[]>response.data) {
+				results.push(new properties(property));
+			}
+			
+			callback(null, results);
+		}).catch(reason => {
+			callback(new Error(reason), null);
+		});
+	};
+	
+	return resource;
 }
 
-SearchResource.$inject = ['$resource'];
+SearchResource.$inject = ['$resource', '$http', '$q', 'PropertyApi'];
 
 
 
