@@ -11,6 +11,7 @@ var faker = require('faker');
 import scraper = require('./utils/realEstateScraper');
 import scrapeAndSaver = require('./utils/scrapeAndSaver')
 import geoUtils = require('./utils/geo');
+import stringUtils = require('./utils/strings');
 
 //printer.configure({ maxDepth: 5 });
 
@@ -102,7 +103,7 @@ function addProperty(): void {
 	});
 }
 
-function addSearch(defaults: { locations: string[]; ownerEmail: string; sharedWithEmail?: string }): void {
+function addSearch(defaults: { suburbNames: string[]; ownerEmail: string; sharedWithEmail?: string }): void {
 	database.users.findOne({ 'email': defaults.ownerEmail }, (err, owner) => {
 		
 		if (err) {
@@ -112,7 +113,7 @@ function addSearch(defaults: { locations: string[]; ownerEmail: string; sharedWi
 			printer.logError('Could not find owner: ' + defaults.ownerEmail);
 		}
 		else {
-			getNewSearch(defaults.locations, search => {			
+			getNewSearch(defaults.suburbNames, search => {			
 				search.ownerId = owner._id;
 				
 				var table = getTable('searches');
@@ -358,22 +359,30 @@ function getNewProperty(): models.IProperty {
 	};
 }
 
-function getNewSearch(locations: string[], callback: (search: models.ISearch) => any) {
+function getNewSearch(suburbNames: string[], callback: (search: models.ISearch) => any) {
+	
+	function randomFeatureImportance(): models.SearchFeatureImportance {
+		switch (faker.random.number(3)) {
+			case 0: return models.SearchFeatureImportance.Unimportant;
+			case 1: return models.SearchFeatureImportance.MustHave;
+			default: return models.SearchFeatureImportance.NiceToHave;
+		}
+	}
 	
 	var search: models.ISearch = {
 		_id: null,
-		title: locations.join(', '),
+		title: suburbNames.join(', '),
 		suburbs: [],
 		listingType: models.ListingType.Rental,
 		propertyTypes: [models.PropertyType.Apartment, models.PropertyType.Unit],
 		
-		has: {
-			airCon: faker.random.boolean() ? undefined : faker.random.boolean(),
-			balcony: faker.random.boolean() ? undefined : faker.random.boolean(),
-			dishwasher: faker.random.boolean() ? undefined : faker.random.boolean(),
-			gym: faker.random.boolean() ? undefined : faker.random.boolean(),
-			laundry: faker.random.boolean() ? undefined : faker.random.boolean(),
-			pool: faker.random.boolean() ? undefined : faker.random.boolean()
+		features: {
+			airCon: randomFeatureImportance(), 
+			balcony: randomFeatureImportance(),
+			dishwasher: randomFeatureImportance(),
+			gym: randomFeatureImportance(),
+			laundry: randomFeatureImportance(),
+			pool: randomFeatureImportance()
 		},
 		
 		min: {
@@ -392,24 +401,24 @@ function getNewSearch(locations: string[], callback: (search: models.ISearch) =>
 	
 	var errorCount = 0;
 	
-	function addSuburbToList(location: string) { 
-		database.suburbs.findOne({ name: location }, (err, suburb) => {
-			if (err) {
+	function addSuburbToList(suburbName: string) {
+		database.suburbs.findOne({ name: stringUtils.toTitleCase(suburbName) }, (err, suburb) => {
+			if (err || !suburb) {
 				errorCount++;
-				printer.logError(new Error(`Could not find suburb: "${location}"`));
+				printer.logError(new Error(`Could not find suburb: "${stringUtils.toTitleCase(suburbName)}"`));
 			}
 			else {
 				search.suburbs.push(suburb);
 			}
 			
-			if (search.suburbs.length + errorCount == locations.length) {
+			if (search.suburbs.length + errorCount == suburbNames.length) {
 				callback(search);
 			}
 		});
 	}
 	
-	for (var location of locations) {
-		addSuburbToList(location);
+	for (var suburbName of suburbNames) {
+		addSuburbToList(suburbName);
 	}
 }
 
@@ -457,14 +466,42 @@ function importSuburbs(fileName?: string) {
 	var parsedCount = 0;
 	var skippedCount = 0;
 	var insertedCount = 0;
+	var failedCount = 0;
 	var hasFinished = false;
 	
 	printer.log(`Importing suburb data from "${fileName}"`);
 	
 	function checkFinished() {
-		if (hasFinished && (insertedCount + skippedCount == parsedCount)) {
-			printer.log(`Finished. Parsed ${parsedCount}, Imported ${insertedCount}, Ignored ${skippedCount} suburbs`);
+		if (hasFinished && (insertedCount + skippedCount + failedCount == parsedCount)) {
+			printer.log(`Finished. Parsed ${parsedCount}, Imported ${insertedCount}, Failed ${failedCount}, Ignored ${skippedCount} suburbs`);
 		}
+	}
+	
+	var insertBuffer: models.ISuburb[] = [];
+	
+	const maxBufferSize = 1000;
+	
+	function flushBuffer() {
+		let buffer = insertBuffer;
+		
+		if (!buffer.length) {
+			return;
+		}
+		
+		database.suburbs.insert(buffer, (err, result) => {
+			insertedCount += result.n;
+			
+			// Count how many were in the buffer that didn't get inserted
+			failedCount = buffer.length - result.n;
+			
+			//if (insertedCount % 1000 == 0) {
+			printer.log(`Imported ${insertedCount} suburbs`);
+			//}
+			
+			checkFinished();
+		});
+		
+		insertBuffer = [];
 	}
 	
 	csv
@@ -489,19 +526,16 @@ function importSuburbs(fileName?: string) {
 				checkFinished();
 			}
 			else {
-				database.suburbs.insert(suburb, () => {
-					insertedCount++;
-					
-					if (insertedCount % 1000 == 0) {
-						printer.log(`Imported ${insertedCount} suburbs`);
-					}
-					
-					checkFinished();
-				});
+				insertBuffer.push(suburb);
+				
+				if (insertBuffer.length == maxBufferSize) {
+					flushBuffer();
+				}
 			}
 		})
-		.on("end", function(){
+		.on("end", function() {
 			hasFinished = true;
+			flushBuffer();
 		});
 }
 
@@ -524,6 +558,25 @@ function showListings(searchTitle: string) {
 	});
 }
 
+function showCount(collectionName: string, query?: any): void {
+	database.connect((err, db) => {
+		if (err) {
+			printer.logError(err);
+		}
+		else {
+			db.collection(collectionName).count((err, count) => {
+				if (err) {
+					printer.logError(err);
+				}
+				else {
+					printer.log(`${count} documents found.`);
+				}
+				db.close();
+			});
+		}
+	});
+}
+
 switch (process.argv[2] || '') {
 	case 'clear':
 		clearTable(process.argv[3]);
@@ -535,6 +588,15 @@ switch (process.argv[2] || '') {
 
 	case 'find':
 		findRows(process.argv[3], process.argv[4]);
+		break;
+		
+	case 'count':
+		if (process.argv[4]) {
+			showCount(process.argv[3], JSON.parse(process.argv[4]));
+		}
+		else {
+			showCount(process.argv[3]);
+		}
 		break;
 
 	case 'add':
@@ -557,7 +619,7 @@ switch (process.argv[2] || '') {
 			case 'search':
 			case 'searches':
 				addSearch({
-					locations: [process.argv[4]],
+					suburbNames: [process.argv[4]],
 					ownerEmail: process.argv[5],
 					sharedWithEmail: process.argv[6]
 				});
