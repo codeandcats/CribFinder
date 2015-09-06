@@ -2,6 +2,8 @@
 
 'use strict';
 
+import printer = require('../utils/printer');
+
 import geoUtils = require('../utils/geo');
 import mongodb = require('mongodb');
 var mongoClient = mongodb.MongoClient;
@@ -89,7 +91,10 @@ export class Crud<T extends models.IModel> {
 		});
 	}
 	
-	public insert(document: T, callback?: (err: Error, result: ICrudResult) => any): void {
+	public insert(document: T, callback?: (err: Error, result: ICrudResult) => any): void;
+	public insert(documents: T[], callback?: (err: Error, result: ICrudResult) => any): void;
+	
+	public insert(documents: T | T[], callback?: (err: Error, result: ICrudResult) => any): void {
 		connect((err, db) => {
 			if (err) {
 				if (callback) {
@@ -97,9 +102,17 @@ export class Crud<T extends models.IModel> {
 				}
 			}
 			else {
-				document._id = document._id || genId();
+				if (!(documents instanceof Array)) {
+					// Convert to array
+					documents = [<T>documents];
+				}
 				
-				db.collection(this.collectionName).insert(document, (err, result) => {
+				// Assign IDs to any documents missing them
+				for (var document of <T[]>documents) {
+					document._id = document._id || genId();
+				}
+				
+				db.collection(this.collectionName).insert(documents, (err, result) => {
 					db.close();
 					if (callback) {
 						callback(err, result && result.result);
@@ -244,12 +257,19 @@ class SearchCrud extends Crud<models.ISearch> {
 		return search;
 	}
 	
-	public insert(search: models.ISearch, callback: (err: Error, result: ICrudResult) => any): void {
-		if (search) {
+	public insert(search: models.ISearch, callback: (err: Error, result: ICrudResult) => any): void;
+	public insert(searches: models.ISearch[], callback: (err: Error, result: ICrudResult) => any): void;
+	
+	public insert(searches: models.ISearch | models.ISearch[], callback: (err: Error, result: ICrudResult) => any): void {
+		if (!(searches instanceof Array)) {
+			searches = [<models.ISearch>searches];
+		}
+		
+		for (var search of <models.ISearch[]>searches) {
 			this.cleanse(search);
 		}
 		
-		super.insert(search, callback);
+		super.insert(<models.ISearch[]>searches, callback);
 	}
 	
 	public update(query: Object, set: models.ISearch, callback: (err: Error, result: IUpdateResult) => any): void {
@@ -276,10 +296,9 @@ class SearchCrud extends Crud<models.ISearch> {
 		var p: models.IProperty;
 		
 		// Features
-		for (let name in search.has) {
-			if (search.has[name]) {
-				query.features = query.has || {};
-				query.features[name] = true;
+		for (let name in search.features) {
+			if (search.features[name] == models.SearchFeatureImportance.MustHave) {
+				query[`features.${name}`] = true;
 			}
 		}
 		
@@ -311,8 +330,12 @@ class SearchCrud extends Crud<models.ISearch> {
 		addMaxFeature('price', search.max.price);
 		addMaxFeature('starRating', search.max.starRating);
 		
+		printer.logValue('Query', query);
+		
 		properties.find(query, (err: Error, properties: models.IProperty[]) => {						
 			var propertiesWithinSearchRadius = <models.IProperty[]>[];
+			
+			printer.logValue('Results pre distance filter', properties.length);
 			
 			for (var property of properties) {
 				for (var searchSuburb of search.suburbs) {
