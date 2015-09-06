@@ -22,6 +22,7 @@ angular
 	
 	.factory('UserApi', resources.UserResource)
 	.factory('SearchApi', resources.SearchResource)
+	.factory('PropertyApi', resources.PropertyResource)
 	
 	.config(states.StateConfig)
 	
