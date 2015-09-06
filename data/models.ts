@@ -87,7 +87,7 @@ export interface IPropertyFeatures {
 
 export interface IProperty extends IPropertySearchResult, IModel {
 	isArchived: boolean;
-
+	
 	lastScrapedTime: Date;
 
 	listingType: ListingType;
@@ -145,6 +145,22 @@ export interface ISearchMaxFeatures {
 	starRating?: number;
 }
 
+export enum SearchFeatureImportance {
+	Unimportant = <any>'Unimportant',
+	MustHave = <any>'MustHave',
+	NiceToHave = <any>'NiceToHave'
+}
+
+export interface ISearchFeatures {
+	dishwasher?: SearchFeatureImportance;
+	airCon?: SearchFeatureImportance;
+	balcony?: SearchFeatureImportance;
+	pool?: SearchFeatureImportance;
+	gym?: SearchFeatureImportance;
+	laundry?: SearchFeatureImportance;
+	furniture?: SearchFeatureImportance;
+}
+
 export interface ISearch extends IModel {
 	title: string;
 	
@@ -156,7 +172,7 @@ export interface ISearch extends IModel {
 	
 	min: ISearchMinFeatures;
 	max: ISearchMaxFeatures;
-	has: IPropertyFeatures;
+	features: ISearchFeatures;
 		
 	ownerId: string;
 	sharedWithIds: string[];
