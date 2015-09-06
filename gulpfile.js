@@ -111,7 +111,7 @@ gulp.task('bundle-client', ['build-client', 'copy-client-libs'], function() {
 });
 
 gulp.task('build', function() {
-	runSequence('bundle-client', 'build-server');
+	runSequence('build-server', 'bundle-client');
 });
 
 gulp.task('default', ['build']);
