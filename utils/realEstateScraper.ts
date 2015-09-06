@@ -244,6 +244,52 @@ function parseMoney(money: string, defaultValue?: number): number {
 	return result;
 }
 
+function decodeHtml(source: string) {
+	var result = source;
+	
+	var replacements = [
+		{
+			replace: /<br>/gi,
+			'with': '\r\n'
+		},
+		{
+			replace: /&amp;/gi,
+			'with': '&'
+		},
+		{
+			replace: /&lsquo;/gi,
+			'with': "'"
+		},
+		{
+			replace: /&rsquo;/gi,
+			'with': "'"
+		},
+		{
+			replace: /&ldquo;/gi,
+			'with': '"'
+		},
+		{
+			replace: /&rdquo;/gi,
+			'with': '"'
+		},
+		{
+			replace: /&ndash;/gi,
+			'with': '–'
+		}
+	];
+	
+	for (var replacement of replacements) {
+		result = result.replace(replacement.replace, replacement.with);
+	}
+	
+	return result;
+}
+
+function changeImageUrlSize(url: string, width: number, height: number): string {
+	var result = url.replace(/\d+x\d+/gi, `${width}x${height}`);
+	return result;
+}
+
 export function scrapeRentalPropertyPage(url: string, callback: (err: Error, property: models.IProperty) => any) {
 	
 	request(url, (err, res, html) =>
@@ -317,9 +363,7 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 		descriptionElement.find('a.more').remove();
 		
 		var description: string = descriptionElement.text();
-		var description = description.replace(/<br>/, '\r\n');
-		
-		description = description.replace(/<br>/gi, '\r\n');
+		description = decodeHtml(description);
 		
 		// Inspection Times
 		var inspectionTimes: models.IInspectionTime[] = [];
@@ -369,6 +413,7 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 		$('.thumbs').find('.thumb img').each((i, image) => {
 			var imageUrl = $(image).attr('src');
 			if (imageUrl) {
+				imageUrl = changeImageUrlSize(imageUrl, 800, 600);
 				images.push({ url: imageUrl });
 			}
 		});
