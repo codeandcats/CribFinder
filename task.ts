@@ -363,7 +363,7 @@ function getNewSearch(suburbNames: string[], callback: (search: models.ISearch) 
 	
 	function randomFeatureImportance(): models.SearchFeatureImportance {
 		switch (faker.random.number(3)) {
-			case 0: return models.SearchFeatureImportance.Unimportant;
+			case 0: return models.SearchFeatureImportance.DontCare;
 			case 1: return models.SearchFeatureImportance.MustHave;
 			default: return models.SearchFeatureImportance.NiceToHave;
 		}

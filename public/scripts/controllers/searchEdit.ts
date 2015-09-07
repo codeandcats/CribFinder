@@ -25,7 +25,7 @@ export class SearchEditController {
 		this.models = models;
 	}
 	
-	public current: models.ISearch;
+	public current: resources.ISearch;
 	
 	public cancel(): void {
 		this.state.go('search', this.stateParams);
@@ -39,9 +39,12 @@ export class SearchEditController {
 		
 		var search = this.current;
 		
+		console.log('saving search: ', search);
+		
 		search.propertyTypes = search.propertyTypes.map((pt: any) => pt.text);
 		//search.su = search.locations.map((pt: any) => pt.text);
-		(<any>search).$update(() => {
+		search.$save(() => {
+			console.log('saved search: ');
 			this.state.go('search', this.stateParams);
 		},
 		(error) => {
@@ -58,7 +61,7 @@ export class SearchEditController {
 			return;
 		}
 		
-		(<any>this.current).$delete(() => {
+		this.current.$delete(() => {
 			this.state.go('home');
 			
 			alert('Search deleted')
@@ -66,5 +69,22 @@ export class SearchEditController {
 		(error) => {
 			alert('Nope! Because errors: ' + (error.message || error));
 		});
+	}
+	
+	public featureMatchesImportance(
+		feature: models.PropertyFeature,
+		importance: models.SearchFeatureImportance) {
+		
+		if (!this.current || !this.current.features) {
+			return false;
+		}
+		
+		var value = this.current.features[feature];
+		
+		if (value == undefined) {
+			return (importance == models.SearchFeatureImportance.DontCare);
+		}
+		
+		return (value == importance); 
 	}
 }

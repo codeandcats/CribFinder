@@ -146,7 +146,7 @@ export interface ISearchMaxFeatures {
 }
 
 export enum SearchFeatureImportance {
-	Unimportant = <any>'Unimportant',
+	DontCare = <any>'DontCare',
 	MustHave = <any>'MustHave',
 	NiceToHave = <any>'NiceToHave'
 }
