@@ -30,9 +30,7 @@ node_modules
 *.js
 *.css
 *.map
-#!public/libs/**/*.js
-#!public/libs/**/*.css
-#!public/libs/**/*.map
+public/libs/**/*.*
 !gulpfile.js
 
 # Typings (these are pulled down by tsd)
