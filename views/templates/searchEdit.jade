@@ -1,60 +1,68 @@
 form.form-horizontal(role='form', ng-if='search.current')
 	.row
-		.col-xs-12
+		//.col-xs-12
 			.form-group.form-group-lg
-				.col-xs-12.col-md-6
+				.col-xs-12.col-md-7
 					input.form-control#title(ng-model='search.current.title', placeholder='Title')
 		
-		.col-md-6
-			.form-group
-				label.control-label.col-xs-3(for='locations') Location
+		.col-md-10
+			.form-group.form-group-lg
+				label.control-label.col-xs-3(for='title') Title
 				.col-xs-9
-					tags-input#locations(ng-model='search.current.locations', placeholder='Location', replace-spaces-with-dashes='false', display-property='name')
+						input.form-control#title(ng-model='search.current.title', placeholder='Title')
+		
+		.col-md-10
+			.row
+				.col-xs-12
+					.form-group
+						label.control-label.col-xs-3(for='locations') Location
+						.col-xs-9
+							tags-input#locations(ng-model='search.current.locations', placeholder='Location', replace-spaces-with-dashes='false', display-property='name')
+				
+				.col-xs-12
+					.form-group
+						label.control-label.col-xs-3(for='propertyTypes') Property Types
+						.col-xs-9
+							tags-input#propertyTypes(ng-model='search.current.propertyTypes', placeholder='Property Types')
+			
+				.col-xs-6.col-sm-3
+					.form-group
+						label.control-label.col-xs-6(for='minBedrooms') Min Beds
+						.col-xs-6
+							input.form-control#minBedrooms(ng-model='search.current.min.bedrooms', placeholder='Beds')
+			
+				.col-xs-6.col-sm-3
+					.form-group
+						label.control-label.col-xs-6(for='minBathrooms') Min Baths
+						.col-xs-6
+							input.form-control#minBathrooms(ng-model='search.current.min.bathrooms', placeholder='Baths')
+							
+				.col-xs-6.col-sm-3
+					.form-group
+						label.control-label.col-xs-6(for='minParks') Parks
+						.col-xs-6
+							input.form-control#minParks(ng-model='search.current.min.parks', placeholder='Parks')
+							
+				.col-xs-6.col-sm-3
+					.form-group
+						label.control-label.col-xs-6(for='maxPrice') Max Price
+						.col-xs-6
+							input.form-control#maxPrice(ng-model='search.current.max.price', placeholder='Price')					
 	
-		.col-md-6
-			.form-group
-				label.control-label.col-xs-3(for='propertyTypes') Property Types
-				.col-xs-9
-					tags-input#propertyTypes(ng-model='search.current.propertyTypes', placeholder='Property Types')
-	
-		.col-xs-6.col-sm-3
-			.form-group
-				label.control-label.col-xs-6(for='minBedrooms') Min Beds
-				.col-xs-6
-					input.form-control#minBedrooms(ng-model='search.current.min.bedrooms', placeholder='Beds')
-	
-		.col-xs-6.col-sm-3
-			.form-group
-				label.control-label.col-xs-6(for='minBathrooms') Min Baths
-				.col-xs-6
-					input.form-control#minBathrooms(ng-model='search.current.min.bathrooms', placeholder='Baths')
-					
-		.col-xs-6.col-sm-3
-			.form-group
-				label.control-label.col-xs-6(for='minParks') Parks
-				.col-xs-6
-					input.form-control#minParks(ng-model='search.current.min.parks', placeholder='Parks')
-					
-		.col-xs-6.col-sm-3
-			.form-group
-				label.control-label.col-xs-6(for='maxPrice') Max Price
-				.col-xs-6
-					input.form-control#maxPrice(ng-model='search.current.max.price', placeholder='Price')					
-	
-		.col-xs-12
-			table.table
-				thead
-					tr
-						th Feature
-						th Don't Care
-						th Nice To Have
-						th Must Have
-					
-					tr(ng-repeat='(feature, featureValue) in search.current.features')
-						td {{feature}}
-						td(ng-repeat='(importance, importanceValue) in search.models.SearchFeatureImportance')
-							input(type='radio', name='{{feature}}', value='{{importance}}')
-					
+				.col-xs-12
+					table.table.table-striped.features
+						thead
+							tr
+								th.feature-name Feature
+								th.feature-importance Don't Care
+								th.feature-importance Nice To Have
+								th.feature-importance Must Have
+							
+							tr(ng-repeat='(feature, featureValue) in search.models.PropertyFeature')
+								td.feature-name {{feature}}
+								td.feature-importance(ng-repeat='(importance, importanceValue) in search.models.SearchFeatureImportance')
+									input(type='radio', name='{{feature}}', value='{{importance}}')
+						
 		//.col-xs-4.col-sm-3.col-md-2
 			.checkbox
 				label.control-label

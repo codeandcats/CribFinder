@@ -21,13 +21,21 @@ export class SearchListingController {
 		public stateParams: searchController.ISearchStateParams,
 		private searchApi: resources.ISearchResource,
 		private $timeout: Function,
-		private $window) {
+		private $window: Window) {
 		
 		// Get search from server
 		this.search = searchApi.get({ id: stateParams.searchId });
 		
 		this.search.$promise.then(() => {
 			this.niceToHaves = [];
+			
+			for (var feature in models.PropertyFeature) {
+				$window.console.log('Feature: ', feature);
+			}
+			
+			for (var importance in models.SearchFeatureImportance) {
+				$window.console.log('Importance: ', importance);
+			}
 			
 			for (var feature in this.search.features) {
 				if (this.search.features[feature] == models.SearchFeatureImportance.NiceToHave) {
