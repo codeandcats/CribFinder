@@ -27,22 +27,40 @@ export class SearchController {
 	
 	public current: models.ISearch;
 	
-	public featuresText(): string {
-		if (!this.current) {
-			return '';
+	private getFeaturesMatchingImportance(importance: models.SearchFeatureImportance): models.PropertyFeature[] {
+		var result: models.PropertyFeature[] = [];
+		
+		if (!this.current || !this.current.features) {
+			return [];
 		}
 		
-		var descriptions = [];
+		for (var feature in models.PropertyFeature) {
+			if (this.current.features[stringUtils.toCamelCase(feature)] == importance) {
+				result.push(feature);
+			}
+		}
+		
+		return result;
+	}
+	
+	public niceToHavesText(): string {
+		var features = this.getFeaturesMatchingImportance(models.SearchFeatureImportance.NiceToHave);
+		return features.join(', ');
+	}
+	
+	public mustHavesText(): string {
+		
+		var features: string[] = [];
 		
 		function addFeature(feature: { name: string; min?: number; max?: number }) {
 			if (feature.min && feature.max) {
-				descriptions.push(`Between ${feature.min} and ${feature.max} ${feature.name}`);
+				features.push(`Between ${feature.min} and ${feature.max} ${feature.name}`);
 			}
 			else if (feature.min) {
-				descriptions.push(`At least ${feature.min} ${feature.name}`);
+				features.push(`At least ${feature.min} ${feature.name}`);
 			}
 			else if (feature.max) {
-				descriptions.push(`At most ${feature.max} ${feature.name}`);
+				features.push(`At most ${feature.max} ${feature.name}`);
 			}
 		}
 		
@@ -62,42 +80,9 @@ export class SearchController {
 			min: this.current.min && this.current.min.parks
 		});
 		
-		var mustHaves = <models.PropertyFeature[]>[];
-		var niceToHaves = <models.PropertyFeature[]>[];
+		features = features.concat(this.getFeaturesMatchingImportance(models.SearchFeatureImportance.MustHave).map(f => stringUtils.toTitleCase(f.toString())));
 		
-		if (this.current.features) {
-			for (let feature in models.PropertyFeature) {
-				feature = stringUtils.toCamelCase(feature);
-				
-				switch (this.current.features[feature]) {
-					case models.SearchFeatureImportance.MustHave:
-						mustHaves.push(feature);
-						break;
-						
-					case models.SearchFeatureImportance.NiceToHave:
-						niceToHaves.push(feature);
-						break; 
-				}
-			}
-		}
-		
-		var result = descriptions.join(', ');
-		
-		if (result) {
-			result += '. ';
-		}
-		
-		if (mustHaves.length) {
-			result += 'Must haves: ' + mustHaves.join(', ') + '. ';
-		}
-		
-		if (niceToHaves.length) {
-			result += 'Nice to haves: ' + niceToHaves.join(', ') + '.';
-		}
-		
-		result = result.trim();
-		
-		return result;
+		return features.join(', ');
 	}
 	
 	public priceText() {

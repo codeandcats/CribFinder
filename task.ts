@@ -343,7 +343,7 @@ function getNewProperty(): models.IProperty {
 			gym: faker.random.boolean(),
 			laundry: faker.random.boolean(),
 			pool: faker.random.boolean(),
-			furniture: faker.random.boolean(),
+			furnished: faker.random.boolean(),
 		},
 		parkCount: faker.random.number(2),
 		images: [],
@@ -382,7 +382,9 @@ function getNewSearch(suburbNames: string[], callback: (search: models.ISearch) 
 			dishwasher: randomFeatureImportance(),
 			gym: randomFeatureImportance(),
 			laundry: randomFeatureImportance(),
-			pool: randomFeatureImportance()
+			pool: randomFeatureImportance(),
+			furnished: randomFeatureImportance(),
+			nbn: randomFeatureImportance()
 		},
 		
 		min: {

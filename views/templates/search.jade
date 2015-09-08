@@ -11,12 +11,19 @@ div(ng-if='search.current')
 		.col-xs-3.col-sm-2.col-md-1 
 			label.control-label Property Types
 		.col-xs-9.col-sm-10.col-md-11 {{search.current.propertyTypes.join(', ')}}
-		
-	.row(ng-if='search.featuresText()')
-		.col-xs-3.col-sm-2.col-md-1 
-			label.control-label Features
-		.col-xs-9.col-sm-10.col-md-11 {{search.featuresText()}}
-		
+	
+	.row(ng-if='search.mustHavesText()')
+		.col-xs-3.col-sm-2.col-md-1
+			label.control-label Must Haves
+		.col-xs-9.col-sm-10.col-md-11
+			p {{search.mustHavesText()}}
+	
+	.row(ng-if='search.niceToHavesText()')
+		.col-xs-3.col-sm-2.col-md-1
+			label.control-label Nice To Haves
+		.col-xs-9.col-sm-10.col-md-11
+			p {{search.niceToHavesText()}}
+	
 	.row(ng-if='search.priceText()')
 		.col-xs-3.col-sm-2.col-md-1 
 			label.control-label Price

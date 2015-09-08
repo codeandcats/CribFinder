@@ -72,7 +72,8 @@ export enum PropertyFeature {
 	Pool = <any>'Pool',
 	Gym = <any>'Gym',
 	Laundry = <any>'Laundry',
-	Furnished = <any>'Furnished'
+	Furnished = <any>'Furnished',
+	NBN = <any>'NBN'
 }
 
 export interface IPropertyFeatures {
@@ -82,7 +83,8 @@ export interface IPropertyFeatures {
 	pool?: boolean;
 	gym?: boolean;
 	laundry?: boolean;
-	furniture?: boolean;
+	furnished?: boolean;
+	nbn?: boolean;
 }
 
 export interface IProperty extends IPropertySearchResult, IModel {
@@ -158,7 +160,8 @@ export interface ISearchFeatures {
 	pool?: SearchFeatureImportance;
 	gym?: SearchFeatureImportance;
 	laundry?: SearchFeatureImportance;
-	furniture?: SearchFeatureImportance;
+	furnished?: SearchFeatureImportance;
+	nbn?: SearchFeatureImportance;
 }
 
 export interface ISearch extends IModel {

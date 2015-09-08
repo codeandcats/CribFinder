@@ -29,14 +29,6 @@ export class SearchListingController {
 		this.search.$promise.then(() => {
 			this.niceToHaves = [];
 			
-			for (var feature in models.PropertyFeature) {
-				$window.console.log('Feature: ', feature);
-			}
-			
-			for (var importance in models.SearchFeatureImportance) {
-				$window.console.log('Importance: ', importance);
-			}
-			
 			for (var feature in this.search.features) {
 				if (this.search.features[feature] == models.SearchFeatureImportance.NiceToHave) {
 					this.niceToHaves.push(feature);

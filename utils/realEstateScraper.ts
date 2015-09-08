@@ -450,7 +450,7 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 				pool: hasPool,
 				gym: hasGym,
 				laundry: hasLaundry,
-				furniture: isFurnished,
+				furnished: isFurnished,
 			},
 			
 			distanceToTrain: null,

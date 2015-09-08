@@ -7,6 +7,7 @@ import searchController = require('./search');
 import models = require('../../../data/models');
 import resources = require('../services/resources');
 import objectUtils = require('../../../utils/objects');
+import stringUtils = require('../../../utils/strings');
 
 export class SearchEditController {
 	
@@ -39,17 +40,19 @@ export class SearchEditController {
 		
 		var search = this.current;
 		
-		console.log('saving search: ', search);
-		
 		search.propertyTypes = search.propertyTypes.map((pt: any) => pt.text);
 		//search.su = search.locations.map((pt: any) => pt.text);
-		search.$save(() => {
-			console.log('saved search: ');
-			this.state.go('search', this.stateParams);
-		},
-		(error) => {
-			alert('Save failed\n\n' + error.message || error);
-		});
+		
+		if (search._id) {
+			search.$update(
+				() => this.state.go('search', this.stateParams),
+				error => alert('Save failed\n\n' + error.message || error));
+		}
+		else {
+			search.$save(
+				() => this.state.go('search', this.stateParams),
+				error => alert('Save failed\n\n' + error.message || error));
+		}
 	}
 	
 	public delete(): void {
@@ -79,12 +82,27 @@ export class SearchEditController {
 			return false;
 		}
 		
-		var value = this.current.features[feature];
+		var featureName = stringUtils.toCamelCase(feature.toString()); 
+		
+		var value = this.current.features[featureName];
 		
 		if (value == undefined) {
 			return (importance == models.SearchFeatureImportance.DontCare);
 		}
 		
 		return (value == importance); 
+	}
+	
+	public setFeatureImportance(
+		feature: models.PropertyFeature,
+		importance: models.SearchFeatureImportance) {
+		
+		if (!this.current || !this.current.features) {
+			return;
+		}
+		
+		var featureName = stringUtils.toCamelCase(feature.toString()); 
+		
+		this.current.features[featureName] = importance;
 	}
 }
