@@ -4,7 +4,7 @@ block scripts
 	script(src='/scripts/bundle.js')
 
 block content
-	div(ng-app='cribFinder')
+	div(ng-app='CribFinder',ng-controller='Main')
 		include navigation.jade
 		
 		div(ui-view)

@@ -2,6 +2,7 @@
 
 /// <reference path="../../typings/angularjs/angular.d.ts" />
 
+import mainController = require('./controllers/main');
 import navigationController = require('./controllers/navigation');
 import homeController = require('./controllers/home');
 import searchController = require('./controllers/search');
@@ -12,8 +13,9 @@ import resources = require('./services/resources');
 import states = require('./config/states');
 
 angular
-	.module('cribFinder', ['ngResource', 'ui.router', 'ngTagsInput'])
+	.module('CribFinder', ['ngResource', 'ui.router', 'ngTagsInput'])
 	
+	.controller('Main', mainController.MainController)
 	.controller('Navigation', navigationController.NavigationController)
 	.controller('Home', homeController.HomeController)
 	.controller('Search', searchController.SearchController)

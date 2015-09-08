@@ -6,6 +6,7 @@
 import models = require('../../../data/models');
 
 export interface ISearch extends models.ISearch, angular.resource.IResource<ISearch> {
+	$update(success: Function, error?: Function): angular.IPromise<ISearch>;
 }
 
 export interface IProperty extends models.IProperty, angular.resource.IResource<IProperty> {

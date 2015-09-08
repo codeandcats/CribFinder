@@ -72,7 +72,8 @@ export enum PropertyFeature {
 	Pool = <any>'Pool',
 	Gym = <any>'Gym',
 	Laundry = <any>'Laundry',
-	Furnished = <any>'Furnished'
+	Furnished = <any>'Furnished',
+	NBN = <any>'NBN'
 }
 
 export interface IPropertyFeatures {
@@ -159,6 +160,7 @@ export interface ISearchFeatures {
 	gym?: SearchFeatureImportance;
 	laundry?: SearchFeatureImportance;
 	furniture?: SearchFeatureImportance;
+	nbn?: SearchFeatureImportance;
 }
 
 export interface ISearch extends IModel {

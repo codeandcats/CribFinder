@@ -67,9 +67,7 @@ export class SearchController {
 		
 		if (this.current.features) {
 			for (let feature in models.PropertyFeature) {
-				feature = stringUtils.toCamelCase(feature);
-				
-				switch (this.current.features[feature]) {
+				switch (this.current.features[stringUtils.toCamelCase(feature)]) {
 					case models.SearchFeatureImportance.MustHave:
 						mustHaves.push(feature);
 						break;

@@ -49,6 +49,7 @@ form.form-horizontal(role='form', ng-if='search.current')
 						.col-xs-6
 							input.form-control#maxPrice(ng-model='search.current.max.price', placeholder='Price')					
 	
+				// List of Features (Must haves and Nice to Haves)
 				.col-xs-12
 					table.table.table-striped.features
 						thead
@@ -61,7 +62,7 @@ form.form-horizontal(role='form', ng-if='search.current')
 							tr(ng-repeat='(feature, featureValue) in search.models.PropertyFeature')
 								td.feature-name {{feature}}
 								td.feature-importance(ng-repeat='(importance, importanceValue) in search.models.SearchFeatureImportance')
-									input(type='radio', name='{{feature}}', value='{{importance}}', ng-checked='search.featureMatchesImportance(feature, importance)')
+									input(type='radio', name='{{feature}}', value='{{importance}}', ng-checked='search.featureMatchesImportance(feature, importance)', ng-click='search.setFeatureImportance(feature, importance)')
 		
 	button.btn.btn-primary(ng-click='search.save()') Save
 	
