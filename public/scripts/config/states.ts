@@ -8,10 +8,10 @@ export class StateConfig {
 	constructor(
 		stateProvider: angular.ui.IStateProvider,
 		urlRouterProvider: angular.ui.IUrlRouterProvider) {
-
+		
 		// For any unmatched url, route to /
 		urlRouterProvider.otherwise('/');		
-
+		
 		stateProvider
 			.state('home', {
 				url: '/',
@@ -23,6 +23,12 @@ export class StateConfig {
 				url: '/search/:searchId',
 				templateUrl: '/templates/search',
 				controller: 'Search',
+				controllerAs: 'search'
+			})
+			.state('searchnew', {
+				url: '/search/new',
+				templateUrl: '/templates/searchEdit',
+				controller: 'SearchNew',
 				controllerAs: 'search'
 			})
 			.state('searchedit', {

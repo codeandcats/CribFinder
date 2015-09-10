@@ -11,14 +11,15 @@ import stringUtils = require('../../../utils/strings');
 
 export class SearchEditController {
 	
-	public static $inject = ['$stateParams', 'SearchApi', '$state'];
+	public static $inject = ['$stateParams', 'SearchApi', '$state', '$window'];
 	
 	public models;
 	
 	constructor(
 		public stateParams: searchController.ISearchStateParams,
 		private searchApi: resources.ISearchResource,
-		private state: angular.ui.IStateService) {
+		private state: angular.ui.IStateService,
+		private window: Window) {
 		
 		// Get search from server
 		this.current = searchApi.get({ id: stateParams.searchId });
@@ -38,21 +39,35 @@ export class SearchEditController {
 		//searchCopy.propertyTypes = searchCopy.propertyTypes.map((pt: any) => pt.text);  
 		//searchCopy.locations = searchCopy.locations.map((pt: any) => pt.text);
 		
-		var search = this.current;
-		
-		search.propertyTypes = search.propertyTypes.map((pt: any) => pt.text);
+		this.current.propertyTypes = this.current.propertyTypes.map((pt: any) => pt.text);
 		//search.su = search.locations.map((pt: any) => pt.text);
 		
-		if (search._id) {
-			search.$update(
-				() => this.state.go('search', this.stateParams),
-				error => alert('Save failed\n\n' + error.message || error));
+		if (this.current._id) {
+			this.update();
 		}
 		else {
-			search.$save(
-				() => this.state.go('search', this.stateParams),
-				error => alert('Save failed\n\n' + error.message || error));
+			this.insert();
 		}
+	}
+	
+	private insert(): void {
+		var title = this.window.prompt('Name your search dawg') || '';
+			
+		if (!title.trim()) {
+			return;
+		}
+		
+		this.current.title = title;
+		
+		this.current.$save(
+			() => this.state.go('search', this.stateParams),
+			error => alert('Save failed\n\n' + error.message || error));
+	}
+	
+	private update(): void {
+		this.current.$update(
+			() => this.state.go('search', this.stateParams),
+			error => alert('Save failed\n\n' + error.message || error));
 	}
 	
 	public delete(): void {
