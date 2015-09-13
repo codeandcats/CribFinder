@@ -1,0 +1,100 @@
+@import 'responsive';
+
+ul.search-results {
+
+	padding: 0;
+
+	> li {
+		
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		margin-bottom: 20px;
+		
+		@media (min-width: @screen-md-min) {
+			&:nth-child(odd) {
+				padding-right: 10px;
+			}
+			
+			&:nth-child(even) {
+				padding-left: 10px;
+			}
+		}
+		
+		.search-result {
+			
+			border: 2px solid darkgray;
+			margin: 0;
+			position: relative;
+			height: 300px;
+			
+			&.archived {
+				border: 2px solid @color-result-archived;
+			}
+			
+			&.new {
+				border: 2px solid @color-result-new;
+			}
+			
+			.search-result-image-container {
+				
+				height: 100%;
+				padding: 0;
+				
+				img {
+					position: absolute;
+					width: 100%;
+					height: 100%;
+				}
+				
+				.address {
+					position: absolute;
+					left: 0;
+					top: 0;
+					right: 0;
+					z-index: 10;
+					padding: 5px 10px;
+					background-color: rgba(0, 0, 0, .5);
+					color: #fff;
+					
+				}
+				
+			}
+			
+			.search-result-details {
+				
+				padding: 15px;
+				
+				.price {
+					text-align: center;
+					font-weight: bold;
+				}
+				
+				.rooms {
+					margin-top: 15px;
+					
+					.bedroom-count,
+					.bathroom-count,
+					.park-count {
+						margin-left: 60px;
+						
+						&:before {
+							background-image: url('/images/rooms.png');
+							background-size: 40px 40px;
+						}
+					}
+				}
+				
+				.nice-to-haves {
+					.nice-to-have {
+						
+					}
+					
+					.more {
+						
+					}
+				}
+			}
+		}
+	}
+}

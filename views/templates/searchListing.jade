@@ -1,18 +1,22 @@
 div(ng-controller='SearchListing as listing')
-	h4.search-results-title Search Results
+	h2.search-results-title Search Results
 	
 	p.search-results-count {{listing.results.length}} properties found.
 	
-	div(class='search-results', ng-repeat='property in listing.results')
-		div(class='search-result panel panel-default')
-			div.panel-heading
-				h4 {{property.title}}
-				
-			div.panel-body
-				div.row
-					div.col-md-4
-						div.thumbnail(href="#")
-							img(ng-if='property.images.length', ng-src='{{property.images[0].url}}')
-					
-					div.col-md-8
-						{{property.description}}
+	ul.search-results
+		li.col-md-6(ng-repeat='property in listing.results')
+			.search-result.row
+				.search-result-image-container.col-xs-8
+					img(class='search-result-image', ng-if='property.images.length', ng-src='{{property.images[0].url}}')
+					.address {{utils.geo.getAddressText(property.address, utils.geo.AddressTextFormat.Suburb)}}
+					.status-label(ng-class='property.status.toLowerCase()')
+				.search-result-details.col-xs-4
+					.price ${{property.price}} {{property.listingType == 'Rental' ? ' per week' : ''}}
+					.hr
+					.rooms
+						.bedroom-count {{property.bedroomCount}}
+						.bathroom-count {{property.bathroomCount}}
+						.park-count {{property.parkCount}}
+					.nice-to-haves
+						.nice-to-have(ng-repeat='feature in listing.niceToHaves')
+						a.more(ng-if='listing.niceToHaves.length > 4', href='#', ng-click="alert('Please sir I want some more')") More...

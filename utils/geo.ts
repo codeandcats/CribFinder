@@ -86,30 +86,49 @@ export function getCoord(
 	performLookup(3);
 }
 
+export enum AddressTextFormat {
+	Street = 0,
+	Suburb = 1,
+	State = 2,
+	PostCode = 3,
+	Country = 4
+};
+
 export function getAddressText(
 	address: models.IPropertyAddress,
-	options?: { includeCountry: boolean }): string {
-		
+	format: AddressTextFormat = AddressTextFormat.PostCode): string {
+	
 	var result = '';
 	
+	var includeSuburb = format >= AddressTextFormat.Suburb, 
+		includeState = format >= AddressTextFormat.State, 
+		includePostCode = format >= AddressTextFormat.PostCode, 
+		includeCountry = format >= AddressTextFormat.Country;
+		
 	if (address.unitNumber) {
 		result = address.unitNumber + ', ';
 	}
 	
 	result += `${address.streetNumber} ${address.streetName} ${address.streetType}`; 
 	
-	if (address.suburb) {
+	if (address.suburb && includeSuburb) {
 		result += `, ${address.suburb}`;
 	}
 	
-	if (address.state) {
-		result += `, ${address.state} ${address.postCode}`; 
+	if (address.state && includeState) {
+		result += `, ${address.state}`; 
 	}
 	
-	if (options && options.includeCountry) {
+	if (address.postCode && includePostCode) {
+		if (!(address.state)) {
+			result += ',';
+		}
+		result += ` ${address.postCode}`;
+	}
+	
+	if (address.country && includeCountry) {
 		result += `, ${address.country}`;
 	}
 	
 	return result;
 }
-

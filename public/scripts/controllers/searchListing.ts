@@ -14,7 +14,7 @@ export class SearchListingController {
 	public static $inject = ['$stateParams', 'SearchApi', '$timeout', '$window'];
 	
 	public search: resources.ISearch;
-	public niceToHaves: models.IPropertyFeatures[];
+	public niceToHaves: models.PropertyFeature[];
 	public results: resources.IProperty[];
 	
 	constructor(
@@ -27,16 +27,20 @@ export class SearchListingController {
 		this.search = searchApi.get({ id: stateParams.searchId });
 		
 		this.search.$promise.then(() => {
-			this.niceToHaves = [];
-			
-			for (var feature in this.search.features) {
-				if (this.search.features[feature] == models.SearchFeatureImportance.NiceToHave) {
-					this.niceToHaves.push(feature);
-				}
-			}
+			this.niceToHaves = this.getNiceToHaves();
 			
 			this.showResults()
 		});
+	}
+	
+	private getNiceToHaves() {
+		var result: models.PropertyFeature[] = [];
+		for (var feature in this.search.features) {
+			if (this.search.features[feature] == models.SearchFeatureImportance.NiceToHave) {
+				result.push(feature);
+			}
+		}
+		return result;
 	}
 	
 	public showResults(): void {

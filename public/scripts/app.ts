@@ -13,6 +13,7 @@ import states = require('./config/states');
 
 import objectUtils = require('../../utils/objects');
 import stringUtils = require('../../utils/strings');
+import geoUtils = require('../../utils/geo');
 import models = require('../../data/models');
 
 interface IRootScope extends angular.IScope {
@@ -20,7 +21,8 @@ interface IRootScope extends angular.IScope {
 	$stateParams: angular.ui.IStateParamsService;
 	utils: {
 		objects: any,
-		strings: any
+		strings: any,
+		geo: any
 	},
 	models: any
 }
@@ -51,7 +53,8 @@ angular
 			
 			$rootScope.utils = {
 				objects: objectUtils,
-				strings: stringUtils
+				strings: stringUtils,
+				geo: geoUtils
 			};
 			
 			$rootScope.models = models;

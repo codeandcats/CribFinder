@@ -1,32 +1,35 @@
-h4(style='display: inline-block; margin-right: 20px') {{search.current.title}}
-button.btn.btn-xs.btn-default(ng-click='search.edit()') Edit
+div
+	h1(style='display: inline-block; margin-right: 20px') {{search.current.title}}
+	button.btn.btn-default.btn-search-edit(ng-click='search.edit()') Edit this search
 
 div(ng-if='search.current')
 	.row
-		.col-xs-3.col-sm-2.col-md-1 
-			label.control-label Locations
-		.col-xs-9.col-sm-10.col-md-11 {{search.current.locations.join(', ')}}
+		.col-xs-3.col-sm-2.col-md-2 
+			label.control-label Suburbs
+		.col-xs-9.col-sm-10.col-md-10 {{search.current.locations.join(', ')}}
 	
 	.row
-		.col-xs-3.col-sm-2.col-md-1 
+		.col-xs-3.col-sm-2.col-md-2 
 			label.control-label Property Types
-		.col-xs-9.col-sm-10.col-md-11 {{search.current.propertyTypes.join(', ')}}
+		.col-xs-9.col-sm-10.col-md-10 {{search.current.propertyTypes.join(', ')}}
 	
 	.row(ng-if='search.mustHavesText()')
-		.col-xs-3.col-sm-2.col-md-1
+		.col-xs-3.col-sm-2.col-md-2
 			label.control-label Must Haves
-		.col-xs-9.col-sm-10.col-md-11
+		.col-xs-9.col-sm-10.col-md-10
 			p {{search.mustHavesText()}}
 	
 	.row(ng-if='search.niceToHavesText()')
-		.col-xs-3.col-sm-2.col-md-1
+		.col-xs-3.col-sm-2.col-md-2
 			label.control-label Nice To Haves
-		.col-xs-9.col-sm-10.col-md-11
+		.col-xs-9.col-sm-10.col-md-10
 			p {{search.niceToHavesText()}}
 	
 	.row(ng-if='search.priceText()')
-		.col-xs-3.col-sm-2.col-md-1 
+		.col-xs-3.col-sm-2.col-md-2
 			label.control-label Price
-		.col-xs-9.col-sm-10.col-md-11 {{search.priceText()}}
-		
+		.col-xs-9.col-sm-10.col-md-10 {{search.priceText()}}
+	
+.hr
+
 ng-include(src="'/templates/searchListing'")

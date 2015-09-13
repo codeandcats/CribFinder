@@ -1,0 +1,52 @@
+.nav-container {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	
+	.container {
+		@media (min-width: @screen-sm-min) {
+			padding: 0;
+		}
+	}
+	
+	nav {
+		border: none;
+		border-radius: 0;
+		margin-bottom: 0;
+		background-color: rgba(0, 0, 0, 0.75);
+		
+		.navbar-header, .navbar-nav {
+			a, a:focus,
+			li a, li a:focus {
+				color: #c0c0c0;
+			}
+			
+			a:hover, 
+			li a:hover {
+				color: #fff;
+			}
+			
+			.open > a,
+			.open > a:focus,
+			.open > a:hover {
+				color: #fff;
+				background-color: #000;
+			}
+			
+			.dropdown-menu {
+				background-color: #000;
+				border-color: #222;
+				
+				> li {
+					&.divider {
+						background-color: #444;
+					}
+					> a:hover {
+						background-color: #615290;
+					}
+				}
+			}
+		}
+	}
+}
