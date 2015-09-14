@@ -17,6 +17,8 @@ div(ng-controller='SearchListing as listing')
 						.bedroom-count {{property.bedroomCount}}
 						.bathroom-count {{property.bathroomCount}}
 						.park-count {{property.parkCount}}
-					.nice-to-haves
-						.nice-to-have(ng-repeat='feature in listing.niceToHaves')
-						a.more(ng-if='listing.niceToHaves.length > 4', href='#', ng-click="alert('Please sir I want some more')") More...
+					.hr
+					ul.nice-to-haves
+						li.nice-to-have(ng-repeat='feature in listing.niceToHaves') {{utils.strings.toTitleCase(feature)}}
+						li
+							a.more(ng-if='listing.niceToHaves.length > 4', href='#', ng-click="alert('Please sir I want some more')") More...

@@ -72,20 +72,49 @@ ul.search-results {
 				
 				.rooms {
 					margin-top: 15px;
+					text-align: center;
 					
 					.bedroom-count,
 					.bathroom-count,
 					.park-count {
-						margin-left: 60px;
+						//margin-left: 60px;
+						display: inline-block;
 						
 						&:before {
-							background-image: url('/images/rooms.png');
-							background-size: 40px 40px;
+							//background-image: url('/images/rooms.png');
+							//background-size: 40px 40px;
 						}
+					}
+					
+					.bedroom-count {
+						&:before {
+							content: 'Bds: ';
+						}
+						&:after {
+							content: ', ';
+						}
+					}
+					
+					.bathroom-count {
+						&:before {
+							content: 'Bths: ';
+						}
+						&:after {
+							content: ', ';
+						}
+					}
+					
+					.park-count:before {
+						content: 'Prks: ';
 					}
 				}
 				
 				.nice-to-haves {
+					margin: 0;
+					padding: 0;
+					list-style: none;
+					text-align: left;
+					
 					.nice-to-have {
 						
 					}

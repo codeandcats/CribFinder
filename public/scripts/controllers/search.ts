@@ -90,18 +90,20 @@ export class SearchController {
 			return '';
 		}
 		
+		var suffix = (this.current.listingType == models.ListingType.Rental) ? ' per week' : '';
+		
 		if (this.current.min && this.current.min.price) {
 			
 			if (this.current.max && this.current.max.price) {
-				return `Between $${this.current.min.price} and $${this.current.max.price}`;
+				return `Between $${this.current.min.price} and $${this.current.max.price}${suffix}`;
 			}
 			else {
-				return `At least $${this.current.min.price}`;
+				return `At least $${this.current.min.price}${suffix}`;
 			}
 			
 		}
 		else if (this.current.max && this.current.max.price) {
-			return `At most $${this.current.max.price}`;
+			return `At most $${this.current.max.price}${suffix}`;
 		}
 		else {
 			return '';
