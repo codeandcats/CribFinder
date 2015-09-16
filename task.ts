@@ -12,6 +12,7 @@ import scraper = require('./utils/realEstateScraper');
 import scrapeAndSaver = require('./utils/scrapeAndSaver')
 import geoUtils = require('./utils/geo');
 import stringUtils = require('./utils/strings');
+import nbnUtils = require('./utils/nbn');
 
 //printer.configure({ maxDepth: 5 });
 
@@ -579,6 +580,30 @@ function showCount(collectionName: string, query?: any): void {
 	});
 }
 
+function checkNbn(addressText: string) {
+	addressText = addressText || '19 Gordon Street, Gordon Park, QLD 4031';	
+	var values = addressText.split(',');
+	
+	printer.log('Looking up NBN Availability: ' + addressText);
+	
+	var address: models.IPropertyAddress = <any>{};
+	
+	[address.streetNumber, address.streetName, address.streetType] = (values[0] || '').split(' ').map(s => s.trim());
+	
+	address.suburb = (values[1] || '').trim();
+	
+	[address.state, address.postCode] = (values[2] || '').split(' ').map(s => s.trim());
+	address.postCode = address.postCode || values[3];
+	
+	geoUtils.getCoord(addressText, (err, coord) => {
+		address.coord = coord;
+		
+		nbnUtils.isAvailable(address, (err, result) => {
+			printer.logValue('Availability', result);
+		});
+	});
+}
+
 switch (process.argv[2] || '') {
 	case 'clear':
 		clearTable(process.argv[3]);
@@ -690,6 +715,10 @@ switch (process.argv[2] || '') {
 	case 'search':
 	case 'listings':
 		showListings(process.argv[3]);
+		break;
+		
+	case 'nbn':
+		checkNbn(process.argv[3]);
 		break;
 
 	default:
