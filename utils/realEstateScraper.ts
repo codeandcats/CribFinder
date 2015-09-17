@@ -14,14 +14,11 @@ import nbnUtils = require('./nbn');
 import db = require('../data/database');
 import printer = require('./printer');
 
-export interface ILocationSuggestion {
-	suburb: string;
-	state: string;
-	postCode: string;
+export interface ISuburbSuggestion extends models.ISuburb {
 	relevance: number;
 }
 
-export function getLocationSuggestions(prefix: string, done: (err: Error, results: ILocationSuggestion[]) => any) {
+export function getLocationSuggestions(prefix: string, done: (err: Error, results: ISuburbSuggestion[]) => any) {
 	if (!prefix) {
 		done(null, []);
 		return;
@@ -35,7 +32,8 @@ export function getLocationSuggestions(prefix: string, done: (err: Error, result
 		}
 		else {
 			var suggestions = JSON.parse(json);
-			var responseResults: ILocationSuggestion[] = suggestions.map(suggestion => {
+			
+			var responseResults: ISuburbSuggestion[] = suggestions.map(suggestion => {
 				var [suburb, state] = suggestion.key.split(',').map(s => s.trim());
 				var postCode: string | number = '';
 				
@@ -51,11 +49,11 @@ export function getLocationSuggestions(prefix: string, done: (err: Error, result
 				}
 				
 				return {
-					suburb: suburb,
+					name: suburb,
 					state: state.toUpperCase(),
-					relevance: suggestion.value,
-					postCode: ''
-				}
+					postCode: postCode,
+					relevance: suggestion.value
+				};
 			});
 			
 			//printer.logValue('lookup results', responseResults);
@@ -77,15 +75,18 @@ export function getLocationSuggestions(prefix: string, done: (err: Error, result
 						
 						//printer.logValue('db results', databaseResults.map(r => r.name + ', ' + r.state));					
 						
-						var results: ILocationSuggestion[] = [];
+						var results: ISuburbSuggestion[] = [];
 						
 						for (var responseResult of responseResults) {
 							for (var databaseResult of databaseResults) {
-								if (databaseResult.name.toUpperCase() == responseResult.suburb.toUpperCase() &&
+								if (databaseResult.name.toUpperCase() == responseResult.name.toUpperCase() &&
+									databaseResult.postCode == responseResult.postCode &&
 									databaseResult.state.toUpperCase() == responseResult.state.toUpperCase()) {
 									
-									responseResult.postCode = databaseResult.postCode;
-									results.push(responseResult); 
+									var result: ISuburbSuggestion = <any>databaseResult;
+									result.relevance = responseResult.relevance;
+									
+									results.push(result);
 								}
 							}							
 						}

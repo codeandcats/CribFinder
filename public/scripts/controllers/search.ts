@@ -85,6 +85,14 @@ export class SearchController {
 		return features.join(', ');
 	}
 	
+	public suburbsText() {
+		if (!this.current || !this.current.suburbs) {
+			return '';
+		}
+		
+		return this.current.suburbs.map(s => `${s.name}, ${s.state} ${s.postCode}`).join('; ');
+	}
+	
 	public priceText() {
 		if (!this.current) {
 			return '';

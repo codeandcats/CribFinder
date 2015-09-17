@@ -18,9 +18,10 @@ form.form-horizontal(role='form', ng-if='search.current')
 			.row
 				.col-xs-12
 					.form-group
-						label.control-label.col-xs-3(for='locations') Location
+						label.control-label.col-xs-3(for='suburbs') Suburbs
 						.col-xs-9
-							tags-input#locations(ng-model='search.current.locations', placeholder='Location', replace-spaces-with-dashes='false', display-property='name')
+							tags-input#suburbs(ng-model='search.current.suburbs', placeholder='Suburbs', replace-spaces-with-dashes='false')
+								auto-complete(source='search.suggestSuburbs($query)')
 				
 				.col-xs-12
 					.form-group

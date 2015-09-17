@@ -11,7 +11,7 @@ import stringUtils = require('../../../utils/strings');
 
 export class SearchEditController {
 	
-	public static $inject = ['$stateParams', 'SearchApi', '$state', '$window'];
+	public static $inject = ['$stateParams', 'SearchApi', '$state', '$window', '$http', '$scope'];
 	
 	public models;
 	
@@ -19,7 +19,9 @@ export class SearchEditController {
 		public stateParams: searchController.ISearchStateParams,
 		private searchApi: resources.ISearchResource,
 		private state: angular.ui.IStateService,
-		private window: Window) {
+		private window: Window,
+		private http: angular.IHttpService,
+		private scope: angular.IScope) {
 		
 		// Get search from server
 		this.current = searchApi.get({ id: stateParams.searchId });
@@ -119,5 +121,11 @@ export class SearchEditController {
 		var featureName = stringUtils.toCamelCase(feature.toString()); 
 		
 		this.current.features[featureName] = importance;
+	}
+	
+	public suggestSuburbs(prefix: string) {
+		var result = this.http.get<models.ISuburb[]>('/api/suburbs/suggest/' + encodeURIComponent(prefix));
+		
+		return result;
 	}
 }

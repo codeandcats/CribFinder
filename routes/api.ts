@@ -4,6 +4,8 @@ import express = require('express');
 import passport = require('passport');
 import database = require('../data/database');
 import stringUtils = require('../utils/strings');
+import scraper = require('../utils/realEstateScraper');
+import models = require('../data/models');
 
 export function map(app: express.Express) {
 	
@@ -20,6 +22,32 @@ export function map(app: express.Express) {
 	
 	var router = express.Router();
 	
+	function extendSuburbs(suburbs: models.ISuburb[]): void {
+		if (suburbs) {
+			suburbs.forEach(s => {
+				(<any>s).text = `${s.name}, ${s.state} ${s.postCode}`;
+			});
+		}
+	}
+	
+	function extendSearches(searches: models.ISearch[]): void {
+		searches.forEach(search => {
+			extendSuburbs(search.suburbs);
+		});
+	}
+	
+	function cleanseSuburb(suburb: models.ISuburb): void {
+		delete (<any>suburb).text;
+		delete (<any>suburb).relevance;
+	}
+	
+	function cleanseSearch(search: models.ISearch): void {
+		search.title = stringUtils.toTitleCase(search.title);
+		if (search.suburbs) {
+			search.suburbs.forEach(s => cleanseSuburb(s));
+		}
+	}
+	
 	// List
 	router.get('/searches', authRequired, function(req, res, next) {
 		
@@ -27,6 +55,7 @@ export function map(app: express.Express) {
 		var userId = req.user._id;
 		
 		database.searches.find({ $or: [{ ownerId: userId }, { sharedWithIds: userId }] }, (err, results) => {
+			extendSearches(results);
 			res.json(results);
 		});
 	});
@@ -51,6 +80,7 @@ export function map(app: express.Express) {
 					res.send(404, 'Not Found');
 				}
 				else {
+					extendSearches([result]);
 					res.json(result);
 				}
 			}
@@ -62,10 +92,14 @@ export function map(app: express.Express) {
 	router.post('/searches', authRequired, (req, res, next) => {
 		
 		var search = req.body;
-		search.title = stringUtils.toTitleCase(search.title);
+		
+		cleanseSearch(search);
+		
 		search.ownerId = req.user._id;
 		
 		console.log('Inserting Search: ', search);
+		
+		
 		
 		database.searches.insert(search, (err, result) => {
 			if (err) {
@@ -99,8 +133,8 @@ export function map(app: express.Express) {
 		};
 		
 		var search = req.body;
-		search.title = stringUtils.toTitleCase(search.title);
-		search.ownerId = req.user._id;
+		
+		cleanseSearch(search);
 		
 		database.searches.update(
 			query,
@@ -169,6 +203,19 @@ export function map(app: express.Express) {
 			}
 		});
 		
+	});
+	
+	// Suburbs List
+	router.get('/suburbs/suggest/:name', function(req, res, next) {
+		scraper.getLocationSuggestions(req.params.name, (err, suburbs) => {
+			if (err) {
+				res.send(500, err.message || err);
+			}
+			else {
+				extendSuburbs(suburbs);
+				res.json(suburbs);
+			}
+		});
 	});
 	
 	// Get current user
