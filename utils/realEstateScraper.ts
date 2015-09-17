@@ -10,6 +10,7 @@ import models = require('../data/models');
 import stringUtils = require('./strings');
 import propertyUtils = require('./property');
 import geoUtils = require('./geo');
+import nbnUtils = require('./nbn');
 
 export interface ILocationSuggestion {
 	name: string;
@@ -465,8 +466,24 @@ export function scrapeRentalPropertyPage(url: string, callback: (err: Error, pro
 		result.starRating = propertyUtils.calculateStarRating(result);
 		
 		geoUtils.getCoord(address, (err, coord) => {
+			
+			if (err) {
+				callback(err, null);
+				return;
+			}
+			
 			result.address.coord = coord;
-			callback(err, result);
+			
+			nbnUtils.isAvailable(address, (err, nbnAvailability) => {	
+				if (err) {
+					callback(err, null);
+					return;
+				}
+				
+				result.features.nbn = nbnAvailability == nbnUtils.NbnAvailability.Available;
+				
+				callback(err, result);
+			});
 		});
 	});
 	

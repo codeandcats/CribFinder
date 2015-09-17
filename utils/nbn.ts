@@ -2,22 +2,45 @@ import request = require('request');
 import models = require('../data/models');
 import printer = require('../utils/printer');
 
-export function isAvailable(address: models.IPropertyAddress, callback: (err: Error, result: any) => any) {
-	
-	// http://www.nbnco.com.au/api/map/search.html?lat=-27.432232&lng=153.05397700000003&streetNumber=8&street=bale%20street&suburb=ascot&postCode=4007&state=qld
-	
+export enum NbnAvailability {
+	Available = <any>'Available',
+	Unavailable = <any>'Unavailable'
+}
+
+export function isAvailable(address: models.IPropertyAddress, callback: (err: Error, result: NbnAvailability) => any) {
 	var options: request.Options = {
 		uri: `http://www.nbnco.com.au/api/map/search.html?lat=${address.coord.lat}&lng=${address.coord.lng}&streetNumber=${address.streetNumber}&street=${address.streetName}%20${address.streetType}&suburb=${address.suburb}&postCode=${address.postCode}&state=${address.state}`,
+		method: 'GET',
 		headers: {
-			Referer: 'http://www.nbnco.com.au/connect-home-or-business/check-your-address.html',
-			Host: 'http://www.nbnco.com.au'
+			Referer: 'http://www.nbnco.com.au/connect-home-or-business/check-your-address.html'
 		}
 	};
 	
-	printer.logValue('request options', options);
-	
 	request(options, (err, response, body) => {
-		var jsonResult = JSON.parse(body);
-		callback(err, jsonResult);
+		if (err) {
+			callback(err, null);
+			return;
+		}
+		
+		var errored = false;
+		var jsonResult;
+		
+		try {
+			jsonResult = JSON.parse(body);
+		}
+		catch (err) {
+			errored = true;
+			callback(err, null);
+		}
+		
+		if (!errored) {
+			var result = NbnAvailability.Unavailable;
+			
+			if (jsonResult && jsonResult.servingArea && jsonResult.servingArea.serviceStatus == 'available') {
+				result = NbnAvailability.Available;
+			} 
+						
+			callback(err, result);
+		}
 	});
 }
