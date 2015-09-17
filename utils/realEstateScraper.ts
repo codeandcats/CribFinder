@@ -11,10 +11,14 @@ import stringUtils = require('./strings');
 import propertyUtils = require('./property');
 import geoUtils = require('./geo');
 import nbnUtils = require('./nbn');
+import db = require('../data/database');
+import printer = require('./printer');
 
 export interface ILocationSuggestion {
-	name: string;
-	score: number;
+	suburb: string;
+	state: string;
+	postCode: string;
+	relevance: number;
 }
 
 export function getLocationSuggestions(prefix: string, done: (err: Error, results: ILocationSuggestion[]) => any) {
@@ -23,17 +27,73 @@ export function getLocationSuggestions(prefix: string, done: (err: Error, result
 		return;
 	}
 	
-	var url = 'http://www.realestate.com.au/suggestwhere.ds?query=' + 
-		encodeURIComponent(prefix);
-		
+	var url = 'http://www.realestate.com.au/suggestwhere.ds?query=' + encodeURIComponent(prefix);
+	
 	request(url, (err, res, json) => {
 		if (err) {
 			done(err, null);
 		}
 		else {
 			var suggestions = JSON.parse(json);
-			var results = suggestions.map(suggestion => { return { name: suggestion.key, score: suggestion.value } });
-			done(null, results);
+			var responseResults: ILocationSuggestion[] = suggestions.map(suggestion => {
+				var [suburb, state] = suggestion.key.split(',').map(s => s.trim());
+				var postCode: string | number = '';
+				
+				var index = state.lastIndexOf(' ');
+				if (index) {
+					postCode = parseInt(state.substring(index + 1));
+					if (isNaN(<number>postCode)) {
+						postCode = '';
+					}
+					else {
+						state = state.substring(0, index);
+					}
+				}
+				
+				return {
+					suburb: suburb,
+					state: state.toUpperCase(),
+					relevance: suggestion.value,
+					postCode: ''
+				}
+			});
+			
+			//printer.logValue('lookup results', responseResults);
+			
+			db.connect((err, db) => {
+				
+				if (err) {
+					done(err, null);
+				}
+				else {
+					var collection = db.collection('suburbs'); 
+					
+					var query = {
+						name: { $regex: new RegExp('^' + prefix, 'i') }
+					};
+					
+					collection.find(query).toArray((err: Error, databaseResults: models.ISuburb[]) => {
+						db.close();
+						
+						//printer.logValue('db results', databaseResults.map(r => r.name + ', ' + r.state));					
+						
+						var results: ILocationSuggestion[] = [];
+						
+						for (var responseResult of responseResults) {
+							for (var databaseResult of databaseResults) {
+								if (databaseResult.name.toUpperCase() == responseResult.suburb.toUpperCase() &&
+									databaseResult.state.toUpperCase() == responseResult.state.toUpperCase()) {
+									
+									responseResult.postCode = databaseResult.postCode;
+									results.push(responseResult); 
+								}
+							}							
+						}
+						
+						done(null, results);
+					});
+				}
+			});
 		}
 	});
 }

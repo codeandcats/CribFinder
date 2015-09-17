@@ -701,6 +701,7 @@ switch (process.argv[2] || '') {
 		break;
 		
 	case 'suggest':
+		printer.log(`Getting suggestions for "${process.argv[3]}":`);
 		scraper.getLocationSuggestions(process.argv[3], (err, results) => {
 			printer.logValue('Suggestions', results);
 		});
