@@ -97,7 +97,17 @@ gulp.task('copy-ng-tags-input', ['build-client'], function() {
 		.pipe(gulp.dest('public/libs/ng-tags-input'));
 });
 
-gulp.task('copy-client-libs', ['copy-angular', 'copy-bootstrap', 'copy-jquery', 'copy-ng-tags-input']);
+gulp.task('copy-isteven-angular-multi-select', ['build-client'], function() {
+	return gulp
+		.src([
+			'node_modules/isteven-angular-multiselect/**/*.js',
+			'node_modules/isteven-angular-multiselect/**/*.css'])
+		.pipe(gulp.dest('public/libs/isteven-angular-multiselect'));
+});
+
+gulp.task('copy-client-libs', [
+	'copy-angular', 'copy-bootstrap', 'copy-jquery', 
+	'copy-ng-tags-input', 'copy-isteven-angular-multi-select']);
 
 gulp.task('bundle-client', ['build-client', 'copy-client-libs'], function() {
 	return gulp

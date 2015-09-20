@@ -23,16 +23,40 @@ export class SearchEditController {
 		private http: angular.IHttpService,
 		private scope: angular.IScope) {
 		
-		// Get search from server
-		this.current = searchApi.get({ id: stateParams.searchId });
+		
+		if (this.isNew()) {
+            this.current = new searchApi();
+            // Default values
+            this.current.title = 'Untitled Search';
+            this.current.min = {};
+            this.current.max = {};
+            this.current.features = this.current.features || {};
+            for (var feature in models.PropertyFeature) {
+                var featureName = stringUtils.toCamelCase(feature);
+                this.current.features[featureName] = models.SearchFeatureImportance.DontCare;
+            }
+        }
+        else {
+			// Get search from server
+			this.current = searchApi.get({ id: stateParams.searchId });
+		}
 		
 		this.models = models;
 	}
 	
 	public current: resources.ISearch;
 	
+    public isNew() {
+        return this.stateParams.searchId == 'add';
+    };
+	
 	public cancel(): void {
-		this.state.go('search', this.stateParams);
+		if (this.isNew()) {
+            this.state.go('home');
+        }
+        else {
+			this.state.go('search', this.stateParams);
+		}
 	}
 	
 	public save(): void {

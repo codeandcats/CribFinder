@@ -19,16 +19,19 @@ export class StateConfig {
 				controller: 'Home',
 				controllerAs: 'home'
 			})
+			.state('searchnew', {
+				url: '/search/add',
+				templateUrl: '/templates/searchEdit',
+				controller: 'SearchEdit',
+				controllerAs: 'search',
+				params: {
+					searchId: 'add'
+				}
+			})
 			.state('search', {
 				url: '/search/:searchId',
 				templateUrl: '/templates/search',
 				controller: 'Search',
-				controllerAs: 'search'
-			})
-			.state('searchnew', {
-				url: '/search/new',
-				templateUrl: '/templates/searchEdit',
-				controller: 'SearchNew',
 				controllerAs: 'search'
 			})
 			.state('searchedit', {

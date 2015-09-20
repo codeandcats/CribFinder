@@ -28,7 +28,7 @@ interface IRootScope extends angular.IScope {
 }
 
 angular
-	.module('CribFinder', ['ngResource', 'ui.router', 'ngTagsInput'])
+	.module('CribFinder', ['ngResource', 'ui.router', 'ngTagsInput', 'isteven-multi-select'])
 	
 	.controller('Navigation', navigationController.NavigationController)
 	.controller('Home', homeController.HomeController)

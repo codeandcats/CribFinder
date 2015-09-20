@@ -1,5 +1,5 @@
 div
-	h1 Edit Search
+	h1 {{search.isNew() ? 'New' : 'Edit'}} Search
 
 form.form-horizontal(role='form', ng-if='search.current')
 	.row
@@ -27,7 +27,8 @@ form.form-horizontal(role='form', ng-if='search.current')
 					.form-group
 						label.control-label.col-xs-3(for='propertyTypes') Property Types
 						.col-xs-9
-							tags-input#propertyTypes(ng-model='search.current.propertyTypes', placeholder='Property Types')
+							isteven-multi-select(input-model='search.propertyTypes')
+							//tags-input#propertyTypes(ng-model='search.current.propertyTypes', placeholder='Property Types')
 			
 				.col-xs-6.col-sm-3
 					.form-group
