@@ -14,11 +14,19 @@ div(ng-controller='SearchListing as listing')
 					.price ${{property.price}} {{property.listingType == 'Rental' ? ' per week' : ''}}
 					.hr
 					.rooms
-						.bedroom-count {{property.bedroomCount}}
-						.bathroom-count {{property.bathroomCount}}
-						.park-count {{property.parkCount}}
+						.room.bedroom-count
+							img(src='/images/icons/small/icon-bed.png')
+							span {{property.bedroomCount}}
+						.room.bathroom-count
+							img(src='/images/icons/small/icon-bath.png')
+							span {{property.bathroomCount}}
+						.room.park-count
+							img(src='/images/icons/small/icon-car.png')
+							span {{property.parkCount}}
 					.hr
 					ul.nice-to-haves
-						li.nice-to-have(ng-repeat='feature in listing.niceToHaves') {{utils.strings.toTitleCase(feature)}}
+						li.nice-to-have(ng-repeat='feature in listing.niceToHaves')
+							img(src='/images/icons/small/tick-green.png')
+							span {{utils.strings.toTitleCase(feature)}}
 						li
-							a.more(ng-if='listing.niceToHaves.length > 4', href='#', ng-click="alert('Please sir I want some more')") More...
+							.more(ng-if='listing.niceToHaves.length > 3') More...

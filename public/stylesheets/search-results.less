@@ -74,53 +74,42 @@ ul.search-results {
 					margin-top: 15px;
 					text-align: center;
 					
-					.bedroom-count,
-					.bathroom-count,
-					.park-count {
-						//margin-left: 60px;
+					.room {
 						display: inline-block;
+						margin-right: 15px;
 						
-						&:before {
-							//background-image: url('/images/rooms.png');
-							//background-size: 40px 40px;
+						@media (max-width: @screen-xs-max) {
+							margin-right: 10px;
 						}
-					}
-					
-					.bedroom-count {
-						&:before {
-							content: 'Bds: ';
+						
+						&:last-of-type {
+							margin: 0;
 						}
-						&:after {
-							content: ', ';
+						
+						img {
+							margin-right: 5px;
 						}
-					}
-					
-					.bathroom-count {
-						&:before {
-							content: 'Bths: ';
-						}
-						&:after {
-							content: ', ';
-						}
-					}
-					
-					.park-count:before {
-						content: 'Prks: ';
 					}
 				}
 				
 				.nice-to-haves {
-					margin: 0;
 					padding: 0;
 					list-style: none;
 					text-align: left;
+					//list-style-image: url('/images/icons/small/tick-green.png');
+					//vertical-align: middle;
 					
 					.nice-to-have {
+						vertical-align: middle;
+						margin-bottom: 5px;
 						
+						img {
+							margin-right: 5px;
+						}
 					}
 					
 					.more {
-						
+						margin-left: 22px;
 					}
 				}
 			}
