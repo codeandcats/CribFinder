@@ -9,11 +9,15 @@ import resources = require('../services/resources');
 import objectUtils = require('../../../utils/objects');
 import stringUtils = require('../../../utils/strings');
 
+interface IPropertyTypeListItem {
+	text: string;
+	type: models.PropertyType;
+	ticked: boolean;
+}
+
 export class SearchEditController {
 	
 	public static $inject = ['$stateParams', 'SearchApi', '$state', '$window', '$http', '$scope'];
-	
-	public models;
 	
 	constructor(
 		public stateParams: searchController.ISearchStateParams,
@@ -23,11 +27,12 @@ export class SearchEditController {
 		private http: angular.IHttpService,
 		private scope: angular.IScope) {
 		
-		
 		if (this.isNew()) {
             this.current = new searchApi();
             // Default values
             this.current.title = 'Untitled Search';
+			this.current.suburbs = [];
+			this.current.propertyTypes = [];
             this.current.min = {};
             this.current.max = {};
             this.current.features = this.current.features || {};
@@ -35,16 +40,45 @@ export class SearchEditController {
                 var featureName = stringUtils.toCamelCase(feature);
                 this.current.features[featureName] = models.SearchFeatureImportance.DontCare;
             }
+			this.refreshPropertyTypes();
         }
         else {
 			// Get search from server
 			this.current = searchApi.get({ id: stateParams.searchId });
+			this.current.$promise.then(() => {
+				this.refreshPropertyTypes();
+			});
 		}
 		
-		this.models = models;
+		this.scope.$watch('propertyTypes', () => {
+			this.updatePropertyTypes();
+		});
 	}
 	
 	public current: resources.ISearch;
+	
+	public propertyTypes: IPropertyTypeListItem[] = [];
+	
+	private refreshPropertyTypes() {
+		this.propertyTypes = [];
+		for (var propertyType in models.PropertyType) {
+			this.propertyTypes.push({
+				text: propertyType,
+				type: propertyType,
+				ticked: this.current && this.current.propertyTypes && this.current.propertyTypes.indexOf(propertyType) > -1
+			});
+		}
+	}
+	
+	private updatePropertyTypes() {
+		var propertyTypes: models.PropertyType[] = [];
+		for (var propertyType in this.propertyTypes) {
+			if (propertyType.ticked) {
+				propertyTypes.push(propertyType.type);
+			}
+		}
+		this.current.propertyTypes = propertyTypes;
+	}
 	
     public isNew() {
         return this.stateParams.searchId == 'add';
@@ -65,7 +99,7 @@ export class SearchEditController {
 		//searchCopy.propertyTypes = searchCopy.propertyTypes.map((pt: any) => pt.text);  
 		//searchCopy.locations = searchCopy.locations.map((pt: any) => pt.text);
 		
-		this.current.propertyTypes = this.current.propertyTypes.map((pt: any) => pt.text);
+		//this.current.propertyTypes = this.current.propertyTypes.filter(()).map((pt: any) => pt.text);
 		//search.su = search.locations.map((pt: any) => pt.text);
 		
 		if (this.current._id) {
