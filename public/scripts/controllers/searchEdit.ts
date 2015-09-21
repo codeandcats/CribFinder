@@ -30,7 +30,7 @@ export class SearchEditController {
 		if (this.isNew()) {
             this.current = new searchApi();
             // Default values
-            this.current.title = 'Untitled Search';
+            this.current.title = '';
 			this.current.suburbs = [];
 			this.current.propertyTypes = [];
             this.current.min = {};
@@ -70,9 +70,9 @@ export class SearchEditController {
 		}
 	}
 	
-	private updatePropertyTypes() {
+	private updatePropertyTypes(): void {
 		var propertyTypes: models.PropertyType[] = [];
-		for (var propertyType in this.propertyTypes) {
+		for (var propertyType of this.propertyTypes) {
 			if (propertyType.ticked) {
 				propertyTypes.push(propertyType.type);
 			}
@@ -101,6 +101,8 @@ export class SearchEditController {
 		
 		//this.current.propertyTypes = this.current.propertyTypes.filter(()).map((pt: any) => pt.text);
 		//search.su = search.locations.map((pt: any) => pt.text);
+		
+		this.updatePropertyTypes();
 		
 		if (this.current._id) {
 			this.update();

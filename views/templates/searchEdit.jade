@@ -1,18 +1,14 @@
 div
 	h1 {{search.isNew() ? 'New' : 'Edit'}} Search
 
-form.form-horizontal(role='form', ng-if='search.current')
+form.form-horizontal(role='form', name='searchForm', ng-if='search.current', novalidate)
 	.row
-		//.col-xs-12
-			.form-group.form-group-lg
-				.col-xs-12.col-md-7
-					input.form-control#title(ng-model='search.current.title', placeholder='Title')
-		
 		.col-md-10
 			.form-group.form-group-lg
-				label.control-label.col-xs-3(for='title') Title
+				label.control-label.col-xs-3(for='title') Search Name
 				.col-xs-9
-						input.form-control#title(ng-model='search.current.title', placeholder='Title')
+					input.form-control#title(name='title', ng-model='search.current.title', placeholder='Search Name', required)
+					div(class='error-message', ng-show='searchForm.title.$dirty && searchForm.title.$error.required') Required dawg
 		
 		.col-md-10
 			.row
@@ -27,7 +23,7 @@ form.form-horizontal(role='form', ng-if='search.current')
 					.form-group
 						label.control-label.col-xs-3(for='propertyTypes') Property Types
 						.col-xs-9
-							isteven-multi-select(input-model='search.propertyTypes')
+							isteven-multi-select(input-model='search.propertyTypes', button-label='text', item-label='text', tick-property='ticked', helper-elements='')
 							//tags-input#propertyTypes(ng-model='search.current.propertyTypes', placeholder='Property Types')
 			
 				.col-xs-6.col-sm-3
