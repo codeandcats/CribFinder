@@ -12,9 +12,13 @@ export class NavigationController {
 		private searchApi: resources.ISearchResource,
 		private userApi: resources.IUserResource) {
 		
+		//alert('about to request stuff');
+		
 		this.productName = 'Crib Finder';
 		this.searches = searchApi.list();
 		this.user = userApi.active();
+		
+		//alert('done requesting stuff');
 	}
 	
 	public productName: string;
