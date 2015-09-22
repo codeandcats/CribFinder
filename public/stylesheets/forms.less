@@ -1,3 +1,5 @@
+@import 'text';
+
 // ----------- VALIDATION ------------
 
 .error-message {
@@ -11,15 +13,32 @@
 
 // -------------- TAGS ---------------
 
-tags-input .tags .tag-item .remove-button {
-	color: #eee !important;
+tags-input .tags {
 	
-	&:hover {
-		color: #f88 !important;
+	.tag-list .tag-item {
+		font-size: @body-size;
+		
+		.remove-button {
+			color: #eee !important;
+			
+			&:hover {
+				color: #f88 !important;
+			}
+		}
+	}
+	
+	> input {
+		font-size: @body-size;
 	}
 }
 
+
+
 // -------------- FORMS ----------------
+
+input {
+	font-size: 16px !important;
+}
 
 .control-label {
 	text-align: left !important;
