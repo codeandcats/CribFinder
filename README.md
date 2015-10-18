@@ -36,11 +36,11 @@ A site for helping you find the perfect home
 	```
 
 ## Running Site
-Run:
-```
-node bin/www
-```
+1. Run:
+	```
+	node bin/www
+	```
 
-Browse:
+2. Browse:
 
-[http://localhost:3000](http://localhost:3000)
+	[http://localhost:3000](http://localhost:3000)
