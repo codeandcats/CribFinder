@@ -6,24 +6,41 @@ A site for helping you find the perfect home
 
 2. Install [MongoDB](https://www.mongodb.org/downloads)
 
-3. Install Packages:
-> npm install
+3. Set up your database directory
+	```
+	cd c:
+	mkdir data
+	mkdir data/db
+	```
 
-4. Install TypeScript Definition package manager globally
-> npm install tsd -g
+4. Install [Node.js](https://nodejs.org/en/)
 
-5. Install TypeScript Definitions:
-> tsd install
+5. Install Packages:
+	```
+	npm install
+	```
 
-6. Install Gulp globally. 
-> npm install gulp -g
+6. Install global packages
+	```
+	npm install tsd gulp -g
+	```
 
-7. Run gulp to build the project
-> gulp
+7. Install TypeScript Definitions:
+	```
+	tsd install
+	```
+
+8. Run gulp to build the project
+	```
+	gulp
+	```
 
 ## Running Site
-Run:
-> node bin/www
+1. Run:
+	```
+	node bin/www
+	```
 
-Browse:
-> http://localhost:3000
+2. Browse:
+
+	[http://localhost:3000](http://localhost:3000)
