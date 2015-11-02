@@ -225,6 +225,15 @@ function scrape(idOrUrl: string, options: { saveToDatabase: boolean }) {
 	
 	function scrapeSearch(id: string, saveToDatabase: boolean) {
 		
+		if (!id) {
+			database.searches.find({}, (err, results) => {
+				for (var result of results) {
+					scrapeSearch(result._id, saveToDatabase);
+				}
+			});
+			return;
+		}
+		
 		database.searches.findOne({ '_id': id }, (err, search) => {
 			if (search) {
 				let url = scraper.getSearchUrl(search);
@@ -696,7 +705,7 @@ switch (process.argv[2] || '') {
 		
 	case 'scrape':
 		scrape(process.argv[3] || '', {
-			saveToDatabase: process.argv[4] == 'save'
+			saveToDatabase: true
 		});
 		break;
 		
