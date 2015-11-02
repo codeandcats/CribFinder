@@ -1,5 +1,9 @@
 # CribFinder
-A site for helping you find the perfect home
+#### A site for helping you find the perfect home
+
+![](/public/images/cf-logo-bw.jpg)
+
+![This project is a work in progress](http://s12.postimg.org/h1mxvvul9/work_in_progress.jpg)
 
 ## Build Instructions
 1. Install [Python 2.x](https://www.python.org/downloads/)
