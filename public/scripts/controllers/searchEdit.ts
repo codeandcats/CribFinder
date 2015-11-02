@@ -8,6 +8,7 @@ import models = require('../../../data/models');
 import resources = require('../services/resources');
 import objectUtils = require('../../../utils/objects');
 import stringUtils = require('../../../utils/strings');
+import eventsModule = require('../services/events');
 
 interface IPropertyTypeListItem {
 	text: string;
@@ -17,11 +18,12 @@ interface IPropertyTypeListItem {
 
 export class SearchEditController {
 	
-	public static $inject = ['$stateParams', 'SearchApi', '$state', '$window', '$http', '$scope'];
+	public static $inject = ['$stateParams', 'SearchApi', 'Events', '$state', '$window', '$http', '$scope'];
 	
 	constructor(
 		public stateParams: searchController.ISearchStateParams,
 		private searchApi: resources.ISearchResource,
+		private events: eventsModule.Events,
 		private state: angular.ui.IStateService,
 		private window: Window,
 		private http: angular.IHttpService,
@@ -113,22 +115,25 @@ export class SearchEditController {
 	}
 	
 	private insert(): void {
-		var title = this.window.prompt('Name your search dawg') || '';
-			
-		if (!title.trim()) {
+		if (!('' + this.current.title).trim()) {
+			alert('You need to name your search dawg.');
 			return;
 		}
 		
-		this.current.title = title;
-		
 		this.current.$save(
-			() => this.state.go('search', this.stateParams),
+			() => {
+				this.events.searches.whenInserted.invoke({ search: this.current });
+				this.state.go('search', this.stateParams);
+			},
 			error => alert('Save failed\n\n' + error.message || error));
 	}
 	
 	private update(): void {
 		this.current.$update(
-			() => this.state.go('search', this.stateParams),
+			() => {
+				this.events.searches.whenUpdated.invoke({ search: this.current });
+				this.state.go('search', this.stateParams);
+			},
 			error => alert('Save failed\n\n' + error.message || error));
 	}
 	
@@ -142,6 +147,8 @@ export class SearchEditController {
 		}
 		
 		this.current.$delete(() => {
+			this.events.searches.whenDeleted.invoke({ search: this.current });
+			
 			this.state.go('home');
 			
 			alert('Search deleted')
