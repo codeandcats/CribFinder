@@ -224,7 +224,6 @@ export function scrapeRentalSearchResults(
 		links.each(function(i, link) {
 			
 			var result: models.IPropertySearchResult = {
-				id: '', 
 				vendor: models.Vendor.RealEstate,
 				vendorId: '',
 				url: 'http://realestate.com.au' + link.attribs['href']
