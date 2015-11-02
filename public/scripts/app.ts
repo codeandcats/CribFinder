@@ -10,6 +10,7 @@ import searchListingController = require('./controllers/searchListing');
 
 import resources = require('./services/resources');
 import states = require('./config/states');
+import events = require('./services/events');
 
 import objectUtils = require('../../utils/objects');
 import stringUtils = require('../../utils/strings');
@@ -39,6 +40,7 @@ angular
 	.factory('UserApi', resources.UserResource)
 	.factory('SearchApi', resources.SearchResource)
 	.factory('PropertyApi', resources.PropertyResource)
+	.factory('Events', function() { return new events.Events(); })
 	
 	.config(states.StateConfig)
 	
