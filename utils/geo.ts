@@ -1,5 +1,5 @@
 import request = require('request');
-import printer = require('printer');
+import printer = require('./printer');
 import models = require('../data/models');
 
 export function haversineDistance(
