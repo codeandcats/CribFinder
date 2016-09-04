@@ -26,12 +26,17 @@ build/Release
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
 node_modules
 
-# Generated css, js and map
-*.js
-*.css
-*.map
-public/libs/**/*.*
-!gulpfile.js
+# Generated css
+client/styles/**/*.css
 
-# Typings (these are pulled down by tsd)
-typings/
+# Generated js
+client/scripts/app/**/*.js
+client/scripts/app/**/*.map
+server/**/*.js
+server/**/*.map
+
+# Typings
+server/typings/
+
+# Hidden files
+**/.DS_Store

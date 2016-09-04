@@ -5,6 +5,21 @@
 	"files.exclude": {
 		"**/*.js": { "when": "$(basename).ts" },
 		"**/*.map": { },
-	//	"**/*.css": { "when": "$(basename).less" }
-	}
+		"client/styles/**/*.css": true
+	},
+	"cSpell.enabledLanguageIds": [
+		"javascript",
+		"javascriptreact",
+		"markdown",
+		"plaintext",
+		"text",
+		"typescript",
+		"typescriptreact"
+	],
+	// Specify paths/files to ignore.
+    "cSpell.ignorePaths": [
+        "node_modules",
+        "vscode-extension",
+        ".git"
+    ]
 }

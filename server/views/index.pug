@@ -1,0 +1,21 @@
+extends layout
+
+block content
+	div#banner
+		//video(poster="", playsinline, autoplay, muted, loop)
+			source(src="http://ak2.picdn.net/shutterstock/videos/6070622/preview/stock-footage-timelapse-view-of-the-melbourne-city-skyline-at-dawn-on-january-in-melbourne-australia.mp4", type="video/mp4")
+
+		video(playsinline, muted, loop)
+			source(src="https://v.ftcdn.net/01/18/75/05/700_F_118750591_80xyNGALeZxgEdPDaWQxTlK3LtrTWA7U_ST.mp4", type="video/mp4")
+
+		div#banner-text
+			h1 Crib Finder
+			h3
+				| Helping individuals, friends, partners and investors
+				br
+				| collaborate on finding their perfect property.
+			button.btn.btn-lg.btn-primary#join Join
+			button.btn.btn-lg.btn-primary#login Log in
+
+block scripts
+	script(src="/scripts/app/index.js")

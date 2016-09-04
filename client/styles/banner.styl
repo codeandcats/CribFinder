@@ -1,0 +1,54 @@
+#banner
+	position relative
+	height 400px
+	overflow hidden
+
+	background-color #000
+
+	#banner-text
+		position absolute
+		top 0
+		padding-top 100px
+		padding-left 20px
+		padding-right 20px
+		height 300px
+		width 100%
+		text-align center
+		vertical-align middle
+
+		title-color = #cb79ea
+		sub-title-color = lighten(title-color, 90%)
+		sub-title-size = 24px
+
+		h1
+			font-family 'Pacifico', cursive
+			text-shadow #000 2px 2px 5px
+			font-size 80px
+			color title-color
+			margin 0
+			padding 0
+			width 100%
+		
+		h3
+			font-family 'Open Sans', sans-serif
+			text-shadow #000 2px 2px 5px
+			font-size sub-title-size
+			line-height sub-title-size * 1.4
+			color sub-title-color
+			margin 0
+			padding-top 15px
+			width 100%
+
+		#join
+			margin-right 20px
+
+		#join, #login
+			margin-top 12px
+			background-color desaturate(darken(title-color, 25%), 50%)
+			outline none
+
+	video
+		margin 0
+		padding 0
+		position relative
+		opacity .7
